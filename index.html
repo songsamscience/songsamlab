@@ -552,6 +552,7 @@ const CONFIG = {
       icon: 'i-flask',
       tabs: ['과학'],            // 시트 탭 이름
       gid: '0',                  // 탭 이름이 바뀌어도 gid로 다시 시도
+      expectHead: /실험|단원|학년/, // 이 탭 머리글의 특징 — 다른 탭 데이터가 섞이는 것을 막습니다
       placeholder: '실험 이름이나 단원으로 찾기',
       sortLabel: '단원순',
       publishedCsv: ''           // '웹에 게시' CSV 주소를 넣으면 이 주소를 먼저 씁니다
@@ -563,6 +564,7 @@ const CONFIG = {
       icon: 'i-toolbox',
       tabs: ['학교수업'],
       gid: '1677663949',
+      expectHead: /도구|업무/,     // '수업 도구' 머리글 — 가상실험 탭('학년,단원,실험명')이 오면 거릅니다
       placeholder: '도구 이름으로 찾기',
       sortLabel: '이름순',
       publishedCsv: ''
@@ -667,12 +669,14 @@ const sectionOf = key => CONFIG.SECTIONS.find(s => s.key === key);
 function endpoints(section){
   const id = CONFIG.SHEET_ID, rid = Date.now(), list = [];
   if (section.publishedCsv) list.push(section.publishedCsv + (section.publishedCsv.includes('?') ? '&' : '?') + 'r=' + rid);
-  section.tabs.forEach(t => list.push(
-    `https://docs.google.com/spreadsheets/d/${id}/gviz/tq?tqx=out:csv;reqId:${rid}&sheet=${encodeURIComponent(t)}`
-  ));
+  // gid를 먼저 씁니다 — 탭 "이름"으로 요청하면 이름이 어긋났을 때
+  // 구글이 오류 대신 첫 번째 탭을 돌려줘서 엉뚱한 목록이 섞일 수 있습니다
   if (section.gid) list.push(
     `https://docs.google.com/spreadsheets/d/${id}/gviz/tq?tqx=out:csv;reqId:${rid}&gid=${section.gid}`
   );
+  section.tabs.forEach(t => list.push(
+    `https://docs.google.com/spreadsheets/d/${id}/gviz/tq?tqx=out:csv;reqId:${rid}&sheet=${encodeURIComponent(t)}`
+  ));
   return list;
 }
 
@@ -691,8 +695,15 @@ async function loadSection(section){
       if (!res.ok) { lastErr = new Error('HTTP ' + res.status); continue; }
       const text = await res.text();
       if (!text || /^\s*</.test(text)) { lastErr = new Error('CSV 아님'); continue; }  // 오류 페이지(HTML)
+      const table = parseCSV(text);
+      // 머리글 검사 — 다른 탭의 표가 돌아오면 받아들이지 않고 다음 주소를 시도합니다
+      const head = (table[0] || []).join(' ');
+      if (section.expectHead && !section.expectHead.test(head)){
+        lastErr = new Error('다른 탭 데이터(머리글 불일치): ' + head.slice(0, 40));
+        continue;
+      }
       fetched = true;
-      const items = toItems(parseCSV(text));
+      const items = toItems(table);
       if (items.length) return items;
     } catch (e) { lastErr = e; }
   }
@@ -1000,7 +1011,7 @@ function renderStats(){
    - 재방문 시 첫 화면이 바로 뜨고, 시트를 못 읽어도 최근 목록을 유지합니다
    - 저장이 막힌 브라우저(시크릿 모드 등)에서는 조용히 건너뜁니다
    ------------------------------------------------------------ */
-const CACHE_KEY = 'songsam-hub-v1';
+const CACHE_KEY = 'songsam-hub-v2';   // v1에 잘못 섞여 저장된 목록을 버리기 위해 버전 올림
 function readCache(){
   try { return JSON.parse(localStorage.getItem(CACHE_KEY)) || null; } catch { return null; }
 }
