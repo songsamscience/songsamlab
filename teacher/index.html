@@ -1,0 +1,1801 @@
+<!DOCTYPE html>
+<html lang="ko" data-variant="teacher" data-theme="light">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="color-scheme" content="light dark">
+<meta name="theme-color" content="#F5F7FA">
+<title>교사용 실험실 · 송쌤과학</title>
+<meta name="description" content="송쌤과학 교사용 실험실 — 과학 가상실험실과 학교 업무 도우미를 단원별로 모았습니다. 거른 목록은 QR로 학생 기기에 보낼 수 있어요.">
+<meta property="og:title" content="송쌤과학 교사용 실험실">
+<meta property="og:description" content="과학 가상실험실과 학교 업무 도우미 모음">
+<meta property="og:type" content="website">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='9' fill='%23FFB7B2'/%3E%3Cpath d='M13 7v7.2L7.4 23.6a2.4 2.4 0 0 0 2.1 3.6h13a2.4 2.4 0 0 0 2.1-3.6L19 14.2V7M11 7h10M10.2 20h11.6' fill='none' stroke='%233A1F1C' stroke-width='2.2' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E">
+
+<!-- 테마 초기값 — 첫 페인트 전에 결정한다 (지침 §6.5-5 ⑤). 키는 시리즈 공통 ssw-theme -->
+<script>
+(function () {
+  try {
+    var t = localStorage.getItem('ssw-theme');
+    if (t === 'dark' || t === 'light') document.documentElement.dataset.theme = t;
+  } catch (e) {}
+})();
+</script>
+
+<link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
+<!-- 웹폰트 1 family — Pretendard Variable 공식 배포 · 버전 고정 · font-display:swap 내장 (§6.2·§13) -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css">
+
+<!--
+  ─────────────────────────────────────────────────────────────
+  디자인 브리프 (일반 웹사이트 지침 V1.6 §2.1)
+  페이지 유형     자료 모음형 Hub (보조: 정보형)
+  한 줄 콘셉트    교탁에서 오늘 단원의 실험을 찾아 열고, 거른 목록을 QR 한 장으로 학생 기기에 보내는 교과서 목차
+  첫 화면의 주인공 단원 목차와 실험 목록 자체 — 제목은 길잡이일 뿐이다
+  핵심 행동       실험 열기 → (거른 뒤) 학생에게 보내기
+  정보 흐름       단원 고르기 또는 검색 → 실험 훑기 → 열기 → 링크·QR로 학생에게
+  레이아웃 전략   Index + list (보조: search + filter) · 넓은 화면은 오른쪽에 업무 도우미 열
+  내비게이션      좌측 목차 레일 → 760px 미만에서 학년·단원 가로 칩 · 1180px 미만에서 [가상실험실|업무 도우미] 전환
+  팔레트          교과서 종이와 잉크 — 푸른 기 도는 회백 종이 · 잉크 남색 · 브랜드 블루 1색(선택·행동) · 상태색 3
+  타이포          1 family Pretendard Variable. 제목 800 (1단계 탈락 — 주인공은 목록) · 설명문 Pretendard
+                  굵기 400/500/600/800, 크기 12/13/15/18 + 제목 clamp(22,…,28)
+  시그니처        L4 데이터 "과학 영역 색 아이콘" — 실험마다 내용을 그린 아이콘을 물리·화학·생명·지구 영역 색 타일에 담고,
+                  목차 점 · 단원 번호 · 실험 타일이 같은 영역 색으로 이어진다 (색은 교과 영역에서 나온다, §6.1)
+                  보조(상호작용) — 교사용에서 거른 목록·단원을 QR 한 장으로 학생용에 같은 상태 + "선생님이 보낸 목록"으로 연다
+  표면·밀도 규칙  무광 종이 위의 흰 실험 타일(반복 객체라 카드 허용, §6.3) — 그림자 없이 hairline. 떠 있는 것은 QR 창 하나
+                  목차·머리·도구 열은 카드로 감싸지 않는다
+  기본 테마       라이트(두 페이지 공통, 사용자 지정) — 다크 전환 가능, 저장 키 ssw-theme
+  규칙 이탈       워드마크 13px/700 — §14 규격 · 채널 아이콘은 공식 색 아이콘(사용자 지정, 새 창 표시는 이름·툴팁으로)
+  이번 금지       중앙 hero + 카드 3열 / 장식용 분자·원자 배경 / 카드 hover lift·글로우
+  ─────────────────────────────────────────────────────────────
+-->
+
+<style>
+/* ══ 토큰 — 두 테마가 같은 목록을 빠짐없이 갖는다 (§6.5-5 ②). 색은 이 두 블록에서만 정의한다 ══ */
+:root{
+  --font-ui:'Pretendard Variable',Pretendard,-apple-system,BlinkMacSystemFont,"Apple SD Gothic Neo","Malgun Gothic",system-ui,sans-serif;
+  --font-title:var(--font-ui);      /* 제목 = Pretendard 800 — 선정 기준 1단계 탈락 */
+
+  --r-0:0; --r-1:6px; --r-2:10px; --r-3:16px; --r-full:999px;   /* 작은 컨트롤 6 · 띠·칩 10 · 창 16 · 가로 칩 full */
+  --control-h:36px; --touch:44px;
+  --icon-inline:17px; --icon-solo:20px;
+  --bar-h:56px;
+  --page-max:1280px;
+  --pad-x:clamp(14px,3.2vw,32px);
+
+  --motion-fast:140ms; --motion-ui:240ms;
+  --ease-out:cubic-bezier(.2,0,0,1); --ease-in:cubic-bezier(.4,0,1,1);
+}
+:root[data-theme="light"]{
+  color-scheme:light;
+  --surface-0:#F5F7FA;  --surface-1:#FFFFFF;  --surface-2:#EAEEF3;
+  --text-1:#111C2B;     --text-2:#45556A;     --text-3:#5F6F83;
+  --line-1:#E1E6EC;     --line-2:#C7D0DB;     --rule:#111C2B;   --leader:#AEB9C6;
+  --accent:#0F6FB8;     --accent-strong:#0A5794; --accent-weak:#E1EDF8;
+  --accent-fill:#0F6FB8; --accent-fill-hover:#0A5794; --on-accent:#FFFFFF;
+  --focus:#0F6FB8;
+  --success:#1F8A5B;    --warning:#A86200;    --danger:#C23B36;
+  --mark:#FFE58A;
+  --scrim:rgba(17,28,43,.5);
+  --shadow-float:0 18px 44px -16px rgba(17,28,43,.42),0 1px 2px rgba(17,28,43,.08);
+  --brand-pink:#FFB7B2; --on-brand-pink:#3A1F1C;
+  --yt:#E5002D;         --ig:#C92A75;
+  --qr-dark:#000000;    --qr-light:#FFFFFF;
+  /* 과학 영역 색 — 아이콘 선·목차 점·단원 번호에만 쓴다(글자 본문에는 쓰지 않는다). 타일 면은 이 색을 표면에 섞어 만든다 */
+  --d-phy:#5856D6;  --d-chem:#0B8A7C;  --d-life:#3C8A2F;  --d-earth:#AE6A13;  --d-etc:#5F6F83;
+  --tile-mix:13%;
+  /* 채널 공식 아이콘 — 테마와 무관하게 같은 색 */
+  --yt-red:#FF0000; --brand-on:#FFFFFF;
+  --ig-1:#FEDA75;   --ig-2:#FA7E1E;   --ig-3:#D62976;   --ig-4:#962FBF;   --ig-5:#4F5BD5;
+}
+:root[data-theme="dark"]{
+  color-scheme:dark;
+  --surface-0:#0E141B;  --surface-1:#151D26;  --surface-2:#1D2732;
+  --text-1:#E9EEF3;     --text-2:#AEBBC8;     --text-3:#8394A6;
+  --line-1:#202B37;     --line-2:#324151;     --rule:#C9D4DF;   --leader:#3F4E60;
+  --accent:#6AB2EE;     --accent-strong:#9ACBF4; --accent-weak:#15304A;
+  --accent-fill:#6AB2EE; --accent-fill-hover:#8EC4F2; --on-accent:#0A1622;
+  --focus:#7DBCF2;
+  --success:#3BB27C;    --warning:#E0A240;    --danger:#F07470;
+  --mark:#6B5410;
+  --scrim:rgba(0,0,0,.62);
+  --shadow-float:0 20px 48px -14px rgba(0,0,0,.75),0 1px 2px rgba(0,0,0,.45);
+  --brand-pink:#FFB7B2; --on-brand-pink:#3A1F1C;
+  --yt:#FF5470;         --ig:#F07DB2;
+  --qr-dark:#000000;    --qr-light:#FFFFFF;
+  --d-phy:#A5A4F5;  --d-chem:#4FCBBB;  --d-life:#85CF73;  --d-earth:#E6A95E;  --d-etc:#97A7B9;
+  --tile-mix:20%;
+  --yt-red:#FF0000; --brand-on:#FFFFFF;
+  --ig-1:#FEDA75;   --ig-2:#FA7E1E;   --ig-3:#D62976;   --ig-4:#962FBF;   --ig-5:#4F5BD5;
+}
+/* 고대비 선호 — 경계선·보조 글자를 한 단계 진하게 (§12) */
+@media (prefers-contrast:more){
+  :root[data-theme="light"]{--line-1:#AEB9C6;--line-2:#7C8A9B;--leader:#6B7A8C;--text-2:#2E3B4C;--text-3:#3F4D5F}
+  :root[data-theme="dark"] {--line-1:#3E4D5E;--line-2:#5A6B7D;--leader:#7A8A9C;--text-2:#D3DCE5;--text-3:#B4C1CE}
+}
+
+/* ══ 기본 마감 (§6.8-4·8) ══ */
+*,*::before,*::after{box-sizing:border-box}
+[hidden]{display:none!important}
+html{-webkit-text-size-adjust:100%;scroll-behavior:smooth;scrollbar-gutter:stable;
+  scrollbar-width:thin;scrollbar-color:var(--line-2) transparent}
+html:has(dialog[open]){overflow:hidden}
+body{
+  margin:0;min-height:100dvh;display:flex;flex-direction:column;
+  background:var(--surface-0);color:var(--text-1);
+  font-family:var(--font-ui);font-size:15px;line-height:1.65;letter-spacing:0;
+  word-break:keep-all;overflow-wrap:break-word;
+  transition:background-color var(--motion-ui) var(--ease-out),color var(--motion-ui) var(--ease-out);
+}
+button,input,select,textarea{font-family:inherit;font-size:inherit;line-height:inherit;color:inherit}
+button{background:none;border:0;padding:0;margin:0;cursor:pointer}
+h1,h2,h3,h4{margin:0;line-height:1.3;text-wrap:balance}
+p{margin:0;text-wrap:pretty}
+a{color:inherit}
+ul,ol{margin:0;padding:0;list-style:none}
+::selection{background:color-mix(in oklab,var(--accent) 26%,transparent)}
+input{caret-color:var(--accent)}
+:focus-visible{outline:2px solid var(--focus);outline-offset:2px;border-radius:var(--r-1)}
+:focus:not(:focus-visible){outline:none}
+::-webkit-scrollbar{width:9px;height:9px}
+::-webkit-scrollbar-track{background:transparent}
+::-webkit-scrollbar-thumb{background:var(--line-2);border-radius:var(--r-full);border:2px solid transparent;background-clip:content-box}
+.sr{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap;border:0}
+.ico{width:1em;height:1em;flex:none;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+.ico--fill{fill:currentColor;stroke:none}
+.n{font-variant-numeric:tabular-nums}
+.skip{position:fixed;left:12px;top:-60px;z-index:90;padding:8px 14px;border-radius:var(--r-1);
+  background:var(--surface-1);color:var(--text-1);font-size:13px;font-weight:600;text-decoration:none;
+  box-shadow:var(--shadow-float);transition:top var(--motion-fast) var(--ease-out)}
+.skip:focus{top:10px}
+
+/* ══ 상단 바 — [칩][송쌤과학] │ [YouTube][Instagram] · · · 유틸리티 (§14·§14.1·§6.5-5) ══ */
+.bar{position:sticky;top:0;z-index:30;background:var(--surface-0);border-bottom:1px solid transparent;
+  transition:border-color var(--motion-ui) var(--ease-out),background-color var(--motion-ui) var(--ease-out)}
+.bar.is-scrolled{border-bottom-color:var(--line-1)}
+.bar__in{max-width:var(--page-max);margin-inline:auto;padding-inline:var(--pad-x);height:var(--bar-h);
+  display:flex;align-items:center;gap:12px}
+.brandset{display:flex;align-items:center;gap:10px;flex:none}
+.brand{position:relative;display:flex;align-items:center;gap:9px;text-decoration:none;color:var(--text-1);
+  font-size:13px;font-weight:700;letter-spacing:-.01em;white-space:nowrap}
+.brand::before{content:"";position:absolute;inset:-9px -6px}
+.brand__chip{width:27px;height:27px;border-radius:var(--r-2);background:var(--brand-pink);color:var(--on-brand-pink);
+  display:grid;place-items:center;flex:none}
+.brand__chip .ico{font-size:16px;stroke-width:2.1}
+.vr{width:1px;height:15px;background:var(--line-2);flex:none}
+.channels{display:flex;align-items:center;gap:8px}
+.ch,.iconbtn{position:relative;width:36px;height:36px;display:grid;place-items:center;flex:none;border-radius:var(--r-1);
+  color:var(--text-2);text-decoration:none;
+  transition:color var(--motion-fast) var(--ease-out),background-color var(--motion-fast) var(--ease-out)}
+.ch::before,.iconbtn::before{content:"";position:absolute;inset:-4px}   /* 보이는 36px · 터치 44px — 간격 8px라 겹치지 않는다 */
+/* 채널 아이콘은 공식 색 그대로 — 알아보는 것이 목적이므로 모양·색을 바꾸지 않는다 (§14.1) */
+.brandico{display:block;flex:none}
+.ch .brandico--yt{width:26px;height:19px}
+.ch .brandico--ig{width:22px;height:22px}
+.iconbtn .ico{font-size:var(--icon-solo)}
+@media (hover:hover){.iconbtn:hover,.ch:hover{background:var(--surface-2);color:var(--text-1)}}
+.iconbtn:active,.ch:active{transform:scale(.94)}
+.bar__title{display:flex;align-items:center;gap:12px;min-width:0;font-size:13px;font-weight:600;color:var(--text-1);
+  white-space:nowrap;opacity:0;transform:translateY(3px);pointer-events:none;
+  transition:opacity var(--motion-ui) var(--ease-out),transform var(--motion-ui) var(--ease-out)}
+.bar__title::before{content:"";width:1px;height:15px;background:var(--line-2);flex:none}
+.bar__title span{overflow:hidden;text-overflow:ellipsis}
+.bar.is-titled .bar__title{opacity:1;transform:none}
+.utils{margin-left:auto;display:flex;align-items:center;gap:8px;flex:none}
+
+.sync{display:flex;align-items:center;gap:7px;padding-inline:4px 6px;font-size:12px;font-weight:500;color:var(--text-2);
+  white-space:nowrap;font-variant-numeric:tabular-nums}
+.sync__dot{width:7px;height:7px;border-radius:50%;background:var(--success);flex:none}
+.sync[data-state="busy"] .sync__dot{background:var(--text-3)}
+.sync[data-state="stale"] .sync__dot{background:var(--warning)}
+.iconbtn.is-busy .ico{animation:spin .9s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+
+@media (max-width:639px){
+  :root{--bar-h:52px}
+  .bar__title,.sync__txt{display:none}
+}
+
+/* ══ 쪽 머리 — 제목은 길잡이. hero를 두지 않는다 (§6.2 크기표: hero는 랜딩형 전용) ══ */
+.shell{container:shell/inline-size;flex:1;width:100%;max-width:var(--page-max);margin-inline:auto;padding:0 var(--pad-x) 48px}
+
+.head{padding:26px 0 24px}
+.head h1{font-family:var(--font-title);font-size:clamp(22px,1.1rem + 1.1vw,28px);font-weight:800;letter-spacing:-.03em;line-height:1.2}
+.lead{margin-top:8px;max-width:34em;font-size:15px;color:var(--text-2)}
+.stats{margin-top:12px;display:flex;flex-wrap:wrap;gap:4px 16px;font-size:13px;font-weight:500;color:var(--text-2)}
+.stats b{margin-left:5px;font-weight:600;color:var(--text-1);font-variant-numeric:tabular-nums}
+
+/* ══ 세그먼트 — 보기 전환 (단원별|최신순 · 좁은 화면의 가상실험실|업무 도우미) ══ */
+.seg{display:inline-flex;gap:2px;padding:3px;border-radius:var(--r-2);background:var(--surface-2)}
+.seg button{position:relative;height:30px;padding:0 12px;border-radius:var(--r-1);display:inline-flex;align-items:center;justify-content:center;gap:6px;
+  font-size:13px;font-weight:500;color:var(--text-2);white-space:nowrap;
+  transition:background-color var(--motion-fast) var(--ease-out),color var(--motion-fast) var(--ease-out)}
+.seg button::before{content:"";position:absolute;inset:-7px 0}
+.seg button[aria-pressed="true"]{background:var(--surface-1);color:var(--text-1);font-weight:600;box-shadow:0 0 0 1px var(--line-2)}
+@media (hover:hover){.seg button[aria-pressed="false"]:hover{color:var(--text-1)}}
+.seg .n{font-size:12px;font-weight:500;color:var(--text-2)}
+
+.switch{display:grid;grid-template-columns:1fr 1fr;width:100%;max-width:440px;margin-bottom:22px}
+.switch button{height:38px}
+.switch button::before{inset:-3px 0}
+
+/* ══ 배치 — Index + list. 역할을 자리에 미리 묶지 않고 컨테이너 폭으로 재배치한다 (§4) ══ */
+.layout{display:grid;grid-template-columns:minmax(0,1fr);grid-template-areas:"labs";align-items:start}
+.toc{grid-area:toc;display:none}
+.labs{grid-area:labs;min-width:0;container:labs/inline-size}
+
+.tools{grid-area:tools;min-width:0}
+.layout[data-pane="lab"] .tools{display:none}
+.layout[data-pane="tools"] .labs{display:none}
+.layout[data-pane="tools"]{grid-template-areas:"tools"}
+
+@container shell (min-width:760px){
+  .layout{grid-template-columns:196px minmax(0,1fr);grid-template-areas:"toc labs";column-gap:clamp(28px,3.2vw,44px)}
+  .toc{display:block;position:sticky;top:calc(var(--bar-h) + 18px);max-height:calc(100dvh - var(--bar-h) - 34px);
+    overflow-y:auto;overscroll-behavior:contain;padding-bottom:12px}
+  .labs .chipbar{display:none}          /* 기본 .chipbar 규칙이 뒤에 오므로 선택자를 한 단계 올린다 */
+
+  .layout[data-pane="tools"]{grid-template-columns:minmax(0,1fr);grid-template-areas:"tools"}
+  .layout[data-pane="tools"] .toc{display:none}
+
+}
+
+@container shell (min-width:1180px){
+  .switch{display:none}
+  .layout[data-pane]{grid-template-columns:196px minmax(0,1fr) 264px;grid-template-areas:"toc labs tools"}
+  .layout[data-pane] .toc,.layout[data-pane] .labs,.layout[data-pane] .tools{display:block}
+  .tools{position:sticky;top:calc(var(--bar-h) + 18px);max-height:calc(100dvh - var(--bar-h) - 34px);overflow-y:auto;
+    overscroll-behavior:contain;padding:0 2px 12px 24px;border-left:1px solid var(--line-1)}
+  .labs .labs__h{position:static;width:auto;height:auto;margin:0 0 14px;overflow:visible;clip:auto;white-space:normal}
+}
+
+.colhead{display:flex;align-items:baseline;gap:8px;font-size:18px;font-weight:600;letter-spacing:-.02em;line-height:1.4}
+.colhead .n{font-size:12px;font-weight:500;color:var(--text-2);letter-spacing:0}
+
+/* ══ 목차 레일 — 형태 문법 ③ 오른쪽 정렬 개수 ══ */
+.toc__label{margin:5px 0 8px 10px;font-size:12px;font-weight:600;color:var(--text-2)}
+.toc ul{display:flex;flex-direction:column;gap:1px}
+.toc li.toc__g{margin-top:8px}
+.toc a{position:relative;display:flex;align-items:baseline;gap:6px;min-height:34px;padding:7px 10px;border-radius:var(--r-1);
+  text-decoration:none;font-size:13px;font-weight:500;line-height:1.45;color:var(--text-2);
+  transition:background-color var(--motion-fast) var(--ease-out),color var(--motion-fast) var(--ease-out)}
+.toc a .n{margin-left:auto;padding-left:8px;font-size:12px;font-weight:500;color:var(--text-2)}
+.toc a.toc__grade,.toc a.toc__all{color:var(--text-1);font-weight:600}
+.toc a.toc__unit{padding-left:12px;gap:7px}
+.toc .no{width:1.1em;flex:none;font-size:12px;font-weight:600;color:var(--text-2);font-variant-numeric:tabular-nums}
+.toc .nm{min-width:0}
+@media (hover:hover){.toc a:hover{background:var(--surface-2);color:var(--text-1)}}
+.toc a[aria-current="true"]{background:var(--accent-weak);color:var(--text-1);font-weight:600}
+.toc a[aria-current="true"]::before{content:"";position:absolute;left:0;top:8px;bottom:8px;width:3px;border-radius:var(--r-full);background:var(--accent)}
+@media (pointer:coarse){.toc a{min-height:44px;align-items:center}}
+
+/* ══ 가상실험실 열 ══ */
+.labs__h{position:absolute;width:1px;height:1px;margin:-1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
+.band{display:flex;align-items:center;gap:10px;margin-bottom:14px;padding:9px 10px 9px 12px;border-radius:var(--r-2);
+  font-size:13px;font-weight:500;line-height:1.5;color:var(--text-1)}
+.band > .ico{font-size:18px}
+.band p{flex:1;min-width:0}
+.band b{font-weight:600}
+.band--warn{background:var(--surface-2)}
+.band--warn > .ico{color:var(--warning)}
+
+.toolbar{display:flex;align-items:center;gap:10px}
+.search{position:relative;flex:1;min-width:0;display:flex;align-items:center}
+.search > .ico{position:absolute;left:12px;font-size:17px;color:var(--text-2);pointer-events:none}
+.search input{width:100%;height:40px;padding:0 12px 0 38px;border-radius:var(--r-1);border:1px solid var(--line-2);
+  background:var(--surface-1);color:var(--text-1);font-size:16px;   /* 16px — iOS 포커스 확대 방지 (§6.8-8) */
+  transition:border-color var(--motion-fast) var(--ease-out)}
+.search input::placeholder{color:var(--text-2);opacity:1}
+.search input::-webkit-search-cancel-button{display:none}
+@media (hover:hover){.search input:hover{border-color:var(--text-3)}}
+.search input:focus-visible{outline:2px solid var(--focus);outline-offset:1px;border-color:transparent}
+.search__kbd{position:absolute;right:10px;min-width:22px;height:22px;display:grid;place-items:center;padding:0 6px;
+  border:1px solid var(--line-2);border-radius:var(--r-1);font:600 12px/1 var(--font-ui);color:var(--text-2);pointer-events:none}
+.search__clear{position:absolute;right:2px;width:36px;height:36px;display:grid;place-items:center;border-radius:var(--r-1);color:var(--text-2)}
+.search__clear .ico{font-size:16px}
+@media (hover:hover){.search__clear:hover{color:var(--text-1);background:var(--surface-2)}}
+.search input:placeholder-shown ~ .search__clear,
+.search input:not(:placeholder-shown) ~ .search__kbd,
+.search input:focus ~ .search__kbd{display:none}
+@media (hover:none){.search__kbd{display:none}}
+/* 오른쪽 여백은 지우기 버튼·단축키 표시가 실제로 보일 때만 비운다 — 좁은 화면에서 안내 문구가 잘리지 않게 */
+.search input:not(:placeholder-shown){padding-right:42px}
+@media (hover:hover){.search input{padding-right:42px}}
+
+.btn{position:relative;display:inline-flex;align-items:center;justify-content:center;gap:7px;height:var(--control-h);padding:0 14px;
+  border-radius:var(--r-1);border:1px solid var(--line-2);background:transparent;color:var(--text-1);
+  font-size:13px;font-weight:600;white-space:nowrap;text-decoration:none;flex:none;
+  transition:background-color var(--motion-fast) var(--ease-out),border-color var(--motion-fast) var(--ease-out),color var(--motion-fast) var(--ease-out)}
+.btn::before{content:"";position:absolute;inset:-4px 0}
+.btn .ico{font-size:var(--icon-inline)}
+@media (hover:hover){.btn:hover{background:var(--surface-2)}}
+.btn:active{transform:scale(.98)}
+.btn--field{height:40px}
+.btn--field::before{inset:-2px 0}
+.btn--primary{background:var(--accent-fill);border-color:var(--accent-fill);color:var(--on-accent)}
+@media (hover:hover){.btn--primary:hover{background:var(--accent-fill-hover);border-color:var(--accent-fill-hover)}}
+
+/* 좁을 때 '학생에게 보내기' → '보내기' (앞말은 화면에서만 숨기고 스크린리더 이름에는 남긴다) */
+@container labs (max-width:379px){
+  .send__w{position:absolute;width:1px;height:1px;margin:-1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
+}
+
+.chipbar{display:grid;gap:10px;margin-top:14px}
+.chips{position:relative;display:flex;gap:6px;overflow-x:auto;scrollbar-width:none;margin-inline:calc(var(--pad-x) * -1);
+  padding:1px var(--pad-x);scroll-padding-inline:var(--pad-x)}
+.chips::-webkit-scrollbar{display:none}
+.chip{position:relative;flex:none;display:inline-flex;align-items:center;gap:6px;height:34px;padding:0 13px;
+  border:1px solid var(--line-2);border-radius:var(--r-full);text-decoration:none;white-space:nowrap;
+  font-size:13px;font-weight:500;color:var(--text-2)}
+.chip::before{content:"";position:absolute;inset:-5px 0}
+.chip .n{font-size:12px;color:var(--text-2)}
+.chip .no{font-weight:600;color:var(--text-2)}
+.chip[aria-current="true"]{background:var(--accent-weak);border-color:var(--accent);color:var(--text-1);font-weight:600}
+
+.listhead{display:flex;align-items:center;justify-content:space-between;gap:12px;min-height:36px;margin-top:16px}
+.count{min-width:0;font-size:13px;font-weight:500;color:var(--text-2)}
+.count b{font-weight:600;color:var(--text-1)}
+
+/* ══ 목록 — 영역 색 아이콘 타일 (L4: 목차 점 · 단원 번호 · 실험 타일이 같은 과학 영역 색으로 이어진다) ══ */
+.list{padding-bottom:8px}
+.grp{margin-top:34px}
+.grp:first-child{margin-top:14px}
+.grp__h{display:flex;align-items:baseline;gap:10px;padding-top:9px;border-top:2px solid var(--rule);
+  font-size:15px;font-weight:800;letter-spacing:-.01em;line-height:1.4}
+.grp__h .n{margin-left:auto;font-size:12px;font-weight:500;color:var(--text-2);letter-spacing:0}
+.grp__h + .items{margin-top:12px}
+.unit{margin-top:22px}
+.unit__head{display:flex;align-items:center;gap:10px;margin-bottom:10px}
+.unit__h{display:flex;align-items:baseline;gap:10px;min-width:0;font-size:18px;font-weight:600;letter-spacing:-.02em;line-height:1.35}
+.unit__no{font-weight:800;color:var(--dom);font-variant-numeric:tabular-nums}
+.unit__no:empty{display:none}
+.unit__n{margin-left:auto;flex:none;font-size:12px;font-weight:500;color:var(--text-2)}
+
+.unit__send{position:relative;flex:none;display:inline-flex;align-items:center;gap:5px;height:30px;padding:0 10px;
+  border:1px solid var(--line-2);border-radius:var(--r-1);font-size:12px;font-weight:600;color:var(--text-2);
+  transition:background-color var(--motion-fast) var(--ease-out),color var(--motion-fast) var(--ease-out),border-color var(--motion-fast) var(--ease-out)}
+.unit__send::before{content:"";position:absolute;inset:-7px 0}
+.unit__send .ico{font-size:15px}
+@media (hover:hover){.unit__send:hover{background:var(--surface-1);color:var(--text-1);border-color:var(--text-3)}}
+
+.items{display:grid;grid-template-columns:repeat(auto-fill,minmax(min(100%,272px),1fr));gap:8px}
+.item{position:relative;display:flex;align-items:center;gap:12px;min-height:66px;padding:10px;
+  border:1px solid var(--line-1);border-radius:var(--r-2);background:var(--surface-1);
+  transition:border-color var(--motion-fast) var(--ease-out)}
+@media (hover:hover){.item:hover{border-color:color-mix(in oklab,var(--dom) 55%,var(--line-2))}}
+.item__ic{width:42px;height:42px;flex:none;display:grid;place-items:center;border-radius:var(--r-2);
+  color:var(--dom);background:color-mix(in oklab,var(--dom) var(--tile-mix),var(--surface-1))}
+.item__ic .ico{font-size:24px;stroke-width:1.6}
+.item__body{flex:1;min-width:0}
+.item__link{display:block;text-decoration:none;color:var(--text-1)}
+.item__link::after{content:"";position:absolute;inset:0;border-radius:var(--r-2)}     /* 타일 전체가 링크 */
+.item__t{display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;
+  font-size:15px;font-weight:600;line-height:1.42;letter-spacing:-.01em}
+@media (hover:hover){.item:hover .item__t{text-decoration:underline;text-decoration-thickness:1px;text-underline-offset:4px;text-decoration-color:var(--text-3)}}
+.item__m{display:flex;flex-wrap:wrap;align-items:center;gap:2px 8px;margin-top:3px;
+  font-size:12px;font-weight:500;line-height:1.5;color:var(--text-2);font-variant-numeric:tabular-nums}
+.item__m:empty{display:none}
+.item__m .new{margin-left:0}
+@supports selector(:has(*)){
+  .item__link:focus-visible{outline:none}
+  .item:has(.item__link:focus-visible){outline:2px solid var(--focus);outline-offset:2px}
+}
+.new{display:inline-block;margin-left:7px;padding:0 5px;border-radius:var(--r-1);vertical-align:1px;
+  font-size:12px;font-weight:600;line-height:1.55;letter-spacing:.02em;color:var(--accent-strong);background:var(--accent-weak)}
+mark{background:var(--mark);color:inherit;font-weight:700;border-radius:0;padding:0 1px;margin:0 -1px}
+
+.item__act{position:relative;z-index:1;display:flex;gap:8px;flex:none}
+.tbtn{position:relative;width:34px;height:34px;display:grid;place-items:center;border-radius:var(--r-1);color:var(--text-2);
+  transition:background-color var(--motion-fast) var(--ease-out),color var(--motion-fast) var(--ease-out)}
+.tbtn::before{content:"";position:absolute;inset:-5px -4px}
+.tbtn .ico{font-size:18px}
+@media (hover:hover){.tbtn:hover{background:var(--surface-2);color:var(--text-1)}}
+.tbtn:active{transform:scale(.92)}
+.tbtn.is-done{color:var(--success)}
+.tbtn[data-tip]::after{content:attr(data-tip);position:absolute;bottom:calc(100% + 6px);left:50%;transform:translateX(-50%);
+  padding:3px 8px;border-radius:var(--r-1);background:var(--text-1);color:var(--surface-0);
+  font-size:12px;font-weight:600;line-height:1.5;white-space:nowrap;pointer-events:none;z-index:2}
+
+/* ══ 새로 올라온 실험 — 최근 한 달 ══ */
+.shelf{margin:16px 0 4px;padding:14px;border-radius:var(--r-3);
+  background:color-mix(in oklab,var(--accent) 6%,var(--surface-0));border:1px solid color-mix(in oklab,var(--accent) 20%,var(--line-1))}
+.shelf__head{display:flex;align-items:center;flex-wrap:wrap;gap:4px 10px;margin-bottom:10px}
+.shelf__head h3{display:flex;align-items:center;gap:8px;font-size:15px;font-weight:800;letter-spacing:-.01em}
+.shelf__head h3 .new{margin:0}
+.shelf__sub{font-size:12px;font-weight:500;color:var(--text-2)}
+.shelf__more{position:relative;margin-left:auto;padding:4px 2px;font-size:13px;font-weight:600;color:var(--accent-strong)}
+.shelf__more::before{content:"";position:absolute;inset:-8px -4px}
+@media (hover:hover){.shelf__more:hover{text-decoration:underline;text-underline-offset:3px}}
+
+/* 영역 색 점 — 목차 · 칩 · 범례 */
+.dot{width:8px;height:8px;flex:none;align-self:center;border-radius:var(--r-full);background:var(--dom)}
+.chip .dot{width:7px;height:7px}
+.fresh{display:inline-block;width:6px;height:6px;margin-left:6px;border-radius:var(--r-full);background:var(--accent);vertical-align:2px}
+.legend{margin:18px 10px 4px;padding-top:12px;border-top:1px solid var(--line-1)}
+.legend p{margin-bottom:6px;font-size:12px;font-weight:600;color:var(--text-2)}
+.legend ul{display:flex;flex-wrap:wrap;gap:4px 12px}
+.legend li{display:flex;align-items:center;gap:6px;font-size:12px;font-weight:500;color:var(--text-2)}
+
+/* ══ 상태 ══ */
+.sk{height:13px;margin:15px 0;border-radius:var(--r-1);background:var(--surface-2);animation:skp 1.2s ease-in-out infinite alternate}
+.sk--h{height:18px;width:38%;margin-top:26px}
+@keyframes skp{from{opacity:.55}to{opacity:1}}
+.empty{padding:30px 0 12px}
+.empty h3{font-size:18px;font-weight:600;letter-spacing:-.02em}
+.empty p{margin-top:6px;max-width:30em;font-size:15px;color:var(--text-2)}
+.empty__btns{display:flex;flex-wrap:wrap;gap:8px;margin-top:16px}
+
+/* ══ 업무 도우미 ══ */
+.tools .colhead{margin-bottom:10px}
+.toollist{display:grid;gap:2px}
+@container shell (max-width:1179px){
+  .toollist{grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:4px 20px}
+}
+.tool{position:relative;display:flex;align-items:center;gap:12px;min-height:48px;margin-inline:-8px;padding:6px 8px;
+  border-radius:var(--r-1);text-decoration:none;color:var(--text-1);
+  transition:background-color var(--motion-fast) var(--ease-out)}
+.tool__ic{width:32px;height:32px;display:grid;place-items:center;flex:none;border-radius:var(--r-1);
+  background:var(--surface-2);color:var(--text-2);transition:color var(--motion-fast) var(--ease-out),background-color var(--motion-fast) var(--ease-out)}
+.tool__ic .ico{font-size:18px}
+.tool__t{flex:1;min-width:0;font-size:15px;font-weight:500;line-height:1.45}
+.tool__ext{font-size:14px;color:var(--text-2)}
+@media (hover:hover){
+  .tool:hover{background:var(--surface-2)}
+  .tool:hover .tool__ic{background:var(--surface-1);color:var(--accent)}
+  .tool:hover .tool__t{text-decoration:underline;text-decoration-thickness:1px;text-underline-offset:4px;text-decoration-color:var(--text-3)}
+}
+.tools__note{margin-top:14px;font-size:12px;font-weight:500;color:var(--text-2)}
+
+/* ══ QR 창 — 교사 화면에서 학생 기기로 넘기는 경로 (§13.5.1 ②) ══ */
+.dlg{width:min(460px,calc(100vw - 24px));max-width:none;max-height:calc(100dvh - 24px);padding:0;border:0;border-radius:var(--r-3);
+  background:var(--surface-1);color:var(--text-1);box-shadow:var(--shadow-float);overflow:auto;overscroll-behavior:contain}
+.dlg::backdrop{background:var(--scrim)}
+.dlg[open]{animation:dlgIn var(--motion-ui) var(--ease-out)}
+@keyframes dlgIn{from{opacity:0;transform:translateY(10px) scale(.985)}}
+.dlg__in{padding:16px 20px 22px}
+.dlg__head{display:flex;align-items:flex-start;gap:10px}
+.dlg__head h2{flex:1;min-width:0;padding-top:6px;font-size:18px;font-weight:600;letter-spacing:-.02em;line-height:1.4}
+.dlg__sub{margin-top:4px;font-size:13px;font-weight:500;color:var(--text-2)}
+.qr{width:fit-content;margin:16px auto 0;padding:14px;border-radius:var(--r-2);background:var(--qr-light);border:1px solid var(--line-1)}
+.qr canvas,.qr img{display:block;width:var(--qr-size,300px);height:var(--qr-size,300px)}
+.qr__fail{width:var(--qr-size,300px);height:var(--qr-size,300px);display:grid;place-items:center;padding:24px;text-align:center;
+  font-size:13px;font-weight:500;line-height:1.6;color:var(--qr-dark)}
+.dlg__url{margin-top:14px;text-align:center;font-size:15px;font-weight:600;line-height:1.5;word-break:normal;overflow-wrap:anywhere;color:var(--text-1)}
+.dlg__url small{display:block;margin-top:2px;font-size:12px;font-weight:500;color:var(--text-2)}
+.dlg__btns{display:flex;gap:8px;margin-top:16px}
+.dlg__btns .btn{flex:1}
+
+/* ══ 바닥글 — 브랜드 문구 + 전환 링크 (§14.1 ②) ══ */
+.foot{border-top:1px solid var(--line-1)}
+.foot__in{max-width:var(--page-max);margin-inline:auto;padding:10px var(--pad-x) 22px;display:flex;flex-wrap:wrap;align-items:center;
+  gap:4px 24px;font-size:12px;font-weight:500;color:var(--text-2)}
+.foot__brand b{font-weight:600;color:var(--text-1)}
+.foot__links{display:flex;flex-wrap:wrap;gap:0 18px;margin-left:auto}
+.foot__links a{display:inline-flex;align-items:center;gap:6px;min-height:44px;text-decoration:none;color:var(--text-2)}
+.foot__links a .ico{font-size:15px}
+.foot__links .brandico--yt{width:18px;height:13px}
+.foot__links .brandico--ig{width:15px;height:15px}
+@media (hover:hover){.foot__links a:hover{color:var(--text-1);text-decoration:underline;text-underline-offset:3px}}
+
+@media (prefers-reduced-motion:reduce){
+  html{scroll-behavior:auto}
+  *,*::before,*::after{transition-duration:1ms!important}
+  .iconbtn:active,.ch:active,.btn:active,.tbtn:active{transform:none}
+  .iconbtn.is-busy .ico,.sk{animation:none}
+  .bar__title{transform:none}
+  @keyframes dlgIn{from{opacity:0}}
+}
+
+/* ══ 인쇄 — 테마와 무관하게 흰 종이·검은 글자, 링크는 주소를 함께 (§13.5.1 ①) ══ */
+@media print{
+  :root[data-theme]{--surface-0:#fff;--surface-1:#fff;--surface-2:#fff;--text-1:#000;--text-2:#333;--text-3:#444;
+    --line-1:#bbb;--line-2:#999;--rule:#000;--leader:#999;--accent:#000;--accent-strong:#000;--accent-weak:#fff;--mark:#fff}
+  html{scrollbar-gutter:auto}
+  body{font-size:10.5pt;background:var(--surface-0)}
+  .bar,.skip,.switch,.toc,.chipbar,.toolbar,.listhead .seg,.item__act,.item__go,.unit__send,.shelf,.band,.dlg,.foot__links,.tools__note,.search__kbd{display:none!important}
+  .shell{max-width:none;padding:0}
+  .head{padding:0 0 8pt}
+  .layout,.layout[data-pane]{display:block!important}
+  .labs,.tools{display:block!important;position:static!important;max-height:none!important;overflow:visible!important;border:0!important;padding:0!important}
+  .labs__h{position:static;width:auto;height:auto;margin:10pt 0 4pt;overflow:visible;clip:auto;white-space:normal}
+  .tools{margin-top:18pt}
+  .items,.toollist{display:block}
+  .item,.tool{display:block;min-height:0;margin:0;padding:3pt 0;border:0;background:none;break-inside:avoid}
+  .item__ic,.tool__ic,.tool__ext{display:none}
+  .item__t{display:inline;-webkit-line-clamp:unset}
+  .item__m{display:inline-flex;margin:0 0 0 8pt}
+  .item__link::after,.tool::after{content:attr(href);position:static;display:block;font-size:8.5pt;color:var(--text-2);word-break:break-all}
+  .grp__h,.unit__head{break-after:avoid}
+  mark{background:none;font-weight:inherit}
+  a{text-decoration:none}
+}
+
+</style>
+</head>
+<body>
+<svg width="0" height="0" style="position:absolute" aria-hidden="true" focusable="false">
+  <symbol id="i-flask" viewBox="0 0 24 24"><path d="M10 3v6.2L4.8 18.1A2 2 0 0 0 6.5 21h11a2 2 0 0 0 1.7-2.9L14 9.2V3"/><path d="M8.5 3h7M7.3 14.5h9.4"/></symbol>
+  <symbol id="i-search" viewBox="0 0 24 24"><circle cx="11" cy="11" r="6.5"/><path d="m20 20-4.2-4.2"/></symbol>
+  <symbol id="i-sun" viewBox="0 0 24 24"><circle cx="12" cy="12" r="4"/><path d="M12 2.5v2M12 19.5v2M4.6 4.6 6 6M18 18l1.4 1.4M2.5 12h2M19.5 12h2M4.6 19.4 6 18M18 6l1.4-1.4"/></symbol>
+  <symbol id="i-moon" viewBox="0 0 24 24"><path d="M20 14.2A8.2 8.2 0 0 1 9.8 4 8.2 8.2 0 1 0 20 14.2z"/></symbol>
+  <symbol id="i-ext" viewBox="0 0 24 24"><path d="M7.5 16.5 16.5 7.5M9 7.5h7.5V15"/></symbol>
+  <symbol id="i-close" viewBox="0 0 24 24"><path d="M6.5 6.5l11 11M17.5 6.5l-11 11"/></symbol>
+  <symbol id="i-alert" viewBox="0 0 24 24"><path d="M12 4.2 2.9 19.5h18.2z"/><path d="M12 10v4.3M12 17.2h.01"/></symbol>
+  <symbol id="i-done" viewBox="0 0 24 24"><path d="m5 12.5 4.5 4.5L19 7.5"/></symbol>
+  <symbol id="i-arrow" viewBox="0 0 24 24"><path d="M4.5 12h15M13.5 6l6 6-6 6"/></symbol>
+  <symbol id="i-info" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 11v5.5M12 7.8h.01"/></symbol>
+
+  <symbol id="i-refresh" viewBox="0 0 24 24"><path d="M20 12a8 8 0 1 1-2.34-5.66"/><path d="M20 4v5h-5"/></symbol>
+  <symbol id="i-copy" viewBox="0 0 24 24"><rect x="8.5" y="8.5" width="11.5" height="11.5" rx="2.2"/><path d="M15.5 8.5V6a2 2 0 0 0-2-2H6a2 2 0 0 0-2 2v7.5a2 2 0 0 0 2 2h2.5"/></symbol>
+  <symbol id="i-qr" viewBox="0 0 24 24"><rect x="3.5" y="3.5" width="6.5" height="6.5" rx="1.2"/><rect x="14" y="3.5" width="6.5" height="6.5" rx="1.2"/><rect x="3.5" y="14" width="6.5" height="6.5" rx="1.2"/><path d="M14 14h3v3h-3zM20.5 14v.01M14 20.5h.01M17.5 20.5h3v-3"/></symbol>
+  <symbol id="i-classroom" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="12" rx="2"/><path d="M7 8.5h6M7 11.5h4M9 20h6M12 16v4"/></symbol>
+  <symbol id="i-image" viewBox="0 0 24 24"><rect x="3" y="4.5" width="18" height="15" rx="2.2"/><circle cx="8.5" cy="9.5" r="1.6"/><path d="m4 17.5 5-4.5 3.5 3 3-2.5 4.5 4"/></symbol>
+  <symbol id="i-calc" viewBox="0 0 24 24"><rect x="4.5" y="2.5" width="15" height="19" rx="2.2"/><path d="M8 6.5h8v3H8z"/><path d="M8.5 13.5h.01M12 13.5h.01M15.5 13.5h.01M8.5 17h.01M12 17h.01M15.5 17h.01" stroke-width="2.4"/></symbol>
+  <symbol id="i-doc" viewBox="0 0 24 24"><path d="M6.5 2.5h7L19 8v12a1.5 1.5 0 0 1-1.5 1.5h-11A1.5 1.5 0 0 1 5 20V4a1.5 1.5 0 0 1 1.5-1.5z"/><path d="M13.5 2.5V8H19M8.5 13h7M8.5 16.5h5"/></symbol>
+  <symbol id="i-check" viewBox="0 0 24 24"><rect x="4.5" y="4" width="15" height="17.5" rx="2.2"/><path d="M9 4V2.5h6V4M8.5 13l2.5 2.5 4.5-5"/></symbol>
+  <symbol id="i-device" viewBox="0 0 24 24"><rect x="4.5" y="2.5" width="15" height="19" rx="2.2"/><path d="M10.5 18.2h3"/></symbol>
+  <symbol id="i-toolbox" viewBox="0 0 24 24"><rect x="3" y="8" width="18" height="12" rx="2.2"/><path d="M8.5 8V5.5A1.5 1.5 0 0 1 10 4h4a1.5 1.5 0 0 1 1.5 1.5V8M3 13h18"/></symbol>
+
+</svg>
+
+<a class="skip" href="#list">실험 목록으로 건너뛰기</a>
+
+<header class="bar" id="bar">
+  <div class="bar__in">
+    <div class="brandset">
+      <a class="brand" href="./" aria-label="송쌤과학 교사용 실험실 — 처음 화면으로">
+        <span class="brand__chip" aria-hidden="true"><svg class="ico"><use href="#i-flask"></use></svg></span>
+        <span>송쌤과학</span>
+      </a>
+      <span class="vr" aria-hidden="true"></span>
+      <nav class="channels" aria-label="송쌤과학 채널">
+        <a class="ch" href="https://www.youtube.com/@songsamscience" target="_blank" rel="noopener noreferrer"
+           aria-label="송쌤과학 유튜브 채널 (새 창)" title="YouTube @songsamscience (새 창)">
+          <svg class="brandico brandico--yt" aria-hidden="true"><use href="#b-youtube"></use></svg>
+        </a>
+        <a class="ch" href="https://www.instagram.com/songsamscience/" target="_blank" rel="noopener noreferrer"
+           aria-label="송쌤과학 인스타그램 (새 창)" title="Instagram @songsamscience (새 창)">
+          <svg class="brandico brandico--ig" aria-hidden="true"><use href="#b-instagram"></use></svg>
+        </a>
+      </nav>
+    </div>
+
+    <p class="bar__title" id="bar-title" aria-hidden="true"><span>교사용 실험실</span></p>
+
+    <div class="utils">
+
+      <p class="sync" id="sync" data-state="busy" role="status"><span class="sync__dot" aria-hidden="true"></span><span class="sync__txt" id="sync-txt">시트 확인 중</span></p>
+      <button type="button" class="iconbtn" id="btn-refresh" aria-label="시트에서 목록 다시 불러오기" title="시트에서 목록 다시 불러오기">
+        <svg class="ico"><use href="#i-refresh"></use></svg>
+      </button>
+
+      <button type="button" class="iconbtn" id="btn-theme" aria-label="다크 모드로 전환" title="다크 모드로 전환 (D)">
+        <svg class="ico"><use href="#i-sun"></use></svg>
+      </button>
+    </div>
+  </div>
+</header>
+
+<main class="shell" id="main">
+  <div class="head">
+    <h1 id="h1">교사용 실험실</h1>
+    <p class="lead">수업에 바로 여는 과학 가상실험실과 학교 업무 도구입니다. 거른 목록은 QR 한 장으로 학생 기기에 보낼 수 있어요.</p>
+    <p class="stats" id="stats">
+      <span>가상실험<b id="st-lab">–</b></span>
+      <span>업무 도우미<b id="st-work">–</b></span>
+      <span>최근 한 달 새 실험<b id="st-new">–</b></span>
+      <span>최근 업데이트<b id="st-last">–</b></span>
+    </p>
+  </div>
+
+  <div class="seg switch" role="group" aria-label="보기 전환">
+    <button type="button" data-pane="lab" aria-pressed="true" aria-controls="labs">가상실험실 <span class="n" id="sw-lab"></span></button>
+    <button type="button" data-pane="tools" aria-pressed="false" aria-controls="tools">업무 도우미 <span class="n" id="sw-work"></span></button>
+  </div>
+
+  <div class="layout" id="layout" data-pane="lab">
+    <nav class="toc" id="toc" aria-label="단원 목차"></nav>
+
+    <section class="labs" id="labs" aria-labelledby="labs-h">
+      <h2 class="colhead labs__h" id="labs-h">가상실험실 <span class="n" id="labs-n"></span></h2>
+
+      <div class="band band--warn" id="notice" role="status" hidden></div>
+
+      <div class="toolbar">
+        <div class="search" role="search">
+          <svg class="ico" aria-hidden="true"><use href="#i-search"></use></svg>
+          <label class="sr" for="q">실험 찾기</label>
+          <input id="q" type="search" placeholder="실험·단원 찾기" autocomplete="off" spellcheck="false" enterkeyhint="search">
+          <kbd class="search__kbd" aria-hidden="true">/</kbd>
+          <button type="button" class="search__clear" id="q-clear" aria-label="검색어 지우기"><svg class="ico"><use href="#i-close"></use></svg></button>
+        </div>
+
+        <button type="button" class="btn btn--field" id="btn-send" aria-haspopup="dialog" aria-label="학생에게 보내기">
+          <svg class="ico" aria-hidden="true"><use href="#i-qr"></use></svg><span><span class="send__w">학생에게 </span>보내기</span>
+        </button>
+
+      </div>
+
+      <div class="chipbar" id="chipbar"></div>
+
+      <div class="listhead">
+        <p class="count" id="count"></p>
+        <div class="seg" role="group" aria-label="보기 순서">
+          <button type="button" data-view="unit" aria-pressed="true">단원별</button>
+          <button type="button" data-view="recent" aria-pressed="false">최신순</button>
+        </div>
+      </div>
+
+      <div class="list" id="list" tabindex="-1"></div>
+    </section>
+
+    <aside class="tools" id="tools" aria-labelledby="tools-h">
+      <h2 class="colhead" id="tools-h">업무 도우미 <span class="n" id="tools-n"></span></h2>
+      <ul class="toollist" id="toollist" role="list"></ul>
+      <p class="tools__note">모두 새 창에서 열려요.</p>
+    </aside>
+
+  </div>
+</main>
+
+<footer class="foot">
+  <div class="foot__in">
+    <p class="foot__brand"><b>송쌤과학</b> · ⓒ 2026 송세호 | 아주중학교 · 무단 복제·상업적 이용 금지</p>
+    <nav class="foot__links" aria-label="더 보기">
+      <a href="https://www.youtube.com/@songsamscience" target="_blank" rel="noopener noreferrer">
+        <svg class="brandico brandico--yt" aria-hidden="true"><use href="#b-youtube"></use></svg>유튜브에서 더 보기<span class="sr"> (새 창)</span>
+      </a>
+      <a href="https://www.instagram.com/songsamscience/" target="_blank" rel="noopener noreferrer">
+        <svg class="brandico brandico--ig" aria-hidden="true"><use href="#b-instagram"></use></svg>@songsamscience<span class="sr"> 인스타그램 (새 창)</span>
+      </a>
+
+      <a href="../student/" id="to-student" target="_blank" rel="noopener noreferrer">
+        <svg class="ico" aria-hidden="true"><use href="#i-ext"></use></svg>학생용 실험실 열기<span class="sr"> (새 창)</span>
+      </a>
+
+    </nav>
+  </div>
+</footer>
+
+<dialog class="dlg" id="dlg" aria-labelledby="dlg-title" aria-describedby="dlg-sub">
+  <div class="dlg__in">
+    <div class="dlg__head">
+      <h2 id="dlg-title"></h2>
+      <button type="button" class="iconbtn" id="dlg-close" aria-label="닫기" title="닫기 (Esc)"><svg class="ico"><use href="#i-close"></use></svg></button>
+    </div>
+    <p class="dlg__sub" id="dlg-sub"></p>
+    <div class="qr" id="qr"></div>
+    <p class="dlg__url" id="dlg-url"></p>
+    <div class="dlg__btns">
+      <button type="button" class="btn" id="dlg-copy"><svg class="ico" aria-hidden="true"><use href="#i-copy"></use></svg><span>링크 복사</span></button>
+      <a class="btn" id="dlg-open" href="./" target="_blank" rel="noopener noreferrer"><svg class="ico" aria-hidden="true"><use href="#i-ext"></use></svg>새 창에서 열기</a>
+    </div>
+    <!-- 목록을 보낼 때만 보인다: 실험 이름과 주소를 줄마다 복사해 알림장·클래스룸에 붙여 넣는다 -->
+    <button type="button" class="btn dlg__list" id="dlg-list" hidden><svg class="ico" aria-hidden="true"><use href="#i-doc"></use></svg><span>실험 목록 복사 (이름 + 주소)</span></button>
+  </div>
+</dialog>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js" defer></script>
+
+<p class="sr" id="live" aria-live="polite"></p>
+
+<!-- ══ 채널 공식 아이콘 + 과학 아이콘 모음 (24×24 선 아이콘, 색은 영역 토큰으로 입힌다) ══ -->
+<svg width="0" height="0" style="position:absolute" aria-hidden="true" focusable="false">
+  <defs>
+    <radialGradient id="g-ig" cx="28%" cy="108%" r="140%">
+      <stop offset="0" style="stop-color:var(--ig-1)"/>
+      <stop offset=".1" style="stop-color:var(--ig-1)"/>
+      <stop offset=".36" style="stop-color:var(--ig-2)"/>
+      <stop offset=".58" style="stop-color:var(--ig-3)"/>
+      <stop offset=".8" style="stop-color:var(--ig-4)"/>
+      <stop offset="1" style="stop-color:var(--ig-5)"/>
+    </radialGradient>
+  </defs>
+  <!-- 공식 모양: 유튜브 = 빨간 둥근 사각 + 흰 재생 삼각형, 인스타그램 = 그라데이션 둥근 사각 + 흰 카메라 -->
+  <symbol id="b-youtube" viewBox="0 0 28 20">
+    <path style="fill:var(--yt-red)" d="M27.4 3.1A3.5 3.5 0 0 0 24.9.6C22.7 0 14 0 14 0S5.3 0 3.1.6A3.5 3.5 0 0 0 .6 3.1C0 5.3 0 10 0 10s0 4.7.6 6.9a3.5 3.5 0 0 0 2.5 2.5C5.3 20 14 20 14 20s8.7 0 10.9-.6a3.5 3.5 0 0 0 2.5-2.5C28 14.7 28 10 28 10s0-4.7-.6-6.9z"/>
+    <path style="fill:var(--brand-on)" d="M11.2 14.3 18.4 10l-7.2-4.3z"/>
+  </symbol>
+  <symbol id="b-instagram" viewBox="0 0 24 24">
+    <rect width="24" height="24" rx="6.5" style="fill:url(#g-ig)"/>
+    <rect x="5" y="5" width="14" height="14" rx="4.2" style="fill:none;stroke:var(--brand-on);stroke-width:1.9"/>
+    <circle cx="12" cy="12" r="3.4" style="fill:none;stroke:var(--brand-on);stroke-width:1.9"/>
+    <circle cx="16.4" cy="7.6" r="1.1" style="fill:var(--brand-on)"/>
+  </symbol>
+
+  <!-- 물리 — 힘 · 운동 · 에너지 · 전기 · 자기 · 열 -->
+  <symbol id="i-force" viewBox="0 0 24 24"><rect x="2.5" y="9" width="7.5" height="7.5" rx="1"/><path d="M10 12.75h10.5M17.5 9.75l3 3-3 3M2 19.5h20"/></symbol>
+  <symbol id="i-spring" viewBox="0 0 24 24"><path d="M6 3h12M12 3v1.5L8.5 6l7 2.2-7 2.2 7 2.2L12 14v1.5"/><rect x="8.5" y="15.5" width="7" height="5.5" rx="1"/></symbol>
+  <symbol id="i-motion" viewBox="0 0 24 24"><circle cx="3.5" cy="12" r="2" opacity=".35"/><circle cx="8" cy="12" r="2" opacity=".55"/><circle cx="13.5" cy="12" r="2" opacity=".78"/><circle cx="20" cy="12" r="2"/><path d="M2 17.5h20"/></symbol>
+  <symbol id="i-egg" viewBox="0 0 24 24"><path d="M12 21c-3.3 0-5.5-2.4-5.5-5.6 0-4.1 2.6-8.9 5.5-8.9s5.5 4.8 5.5 8.9c0 3.2-2.2 5.6-5.5 5.6z"/><path d="M8 2.5v2M12 1.5v2.5M16 2.5v2"/></symbol>
+  <symbol id="i-energy" viewBox="0 0 24 24"><path d="M13 2 4.5 13.5H11L10 22l8.5-11.5H12z"/></symbol>
+  <symbol id="i-bulb" viewBox="0 0 24 24"><path d="M9 18h6M10 21h4"/><path d="M12 3a6 6 0 0 0-3.5 10.9c.6.5 1 1.2 1 2V18h5v-2.1c0-.8.4-1.5 1-2A6 6 0 0 0 12 3z"/></symbol>
+  <symbol id="i-magnet" viewBox="0 0 24 24"><path d="M5 3v9a7 7 0 0 0 14 0V3h-4.5v9a2.5 2.5 0 0 1-5 0V3z"/><path d="M5 7h4.5M14.5 7H19"/></symbol>
+  <symbol id="i-thermo" viewBox="0 0 24 24"><path d="M10 4.5a2 2 0 0 1 4 0v9.8a4 4 0 1 1-4 0z"/><path d="M12 9.5v7"/></symbol>
+  <!-- 물리 — 빛 · 파동 · 소리 -->
+  <symbol id="i-refract" viewBox="0 0 24 24"><path d="M2 12h20"/><path d="M4.5 4.5 12 12l7.5-7.5"/><path d="M12 12l2.8 9"/></symbol>
+  <symbol id="i-mirror" viewBox="0 0 24 24"><path d="M13 3v18M13 5.5 15.5 3M13 10l2.5-2.5M13 14.5l2.5-2.5M13 19l2.5-2.5"/><path d="M6.5 17V8.5M4.8 10.3 6.5 8.5l1.7 1.8"/><path d="M19.5 17V8.5M17.8 10.3l1.7-1.8 1.7 1.8" stroke-dasharray="1.6 1.8"/></symbol>
+  <symbol id="i-lens" viewBox="0 0 24 24"><path d="M12 3c1.8 2.6 1.8 15.4 0 18-1.8-2.6-1.8-15.4 0-18z"/><path d="M2 8.5h10l9 3.5M2 15.5h10l9-3.5"/></symbol>
+  <symbol id="i-eye" viewBox="0 0 24 24"><path d="M2.5 12S6 6.5 12 6.5 21.5 12 21.5 12 18 17.5 12 17.5 2.5 12 2.5 12z"/><circle cx="12" cy="12" r="3"/><circle cx="12" cy="12" r=".9" fill="currentColor"/></symbol>
+  <symbol id="i-prism" viewBox="0 0 24 24"><path d="M10 4 17 18H3z"/><path d="M1 11.5l5.6-.5 7.4 1M13.5 11l9-2.5M14 12l8.5.5M14.5 13l7.5 4"/></symbol>
+  <symbol id="i-rgb" viewBox="0 0 24 24"><circle cx="9" cy="9.5" r="5"/><circle cx="15" cy="9.5" r="5"/><circle cx="12" cy="14.5" r="5"/></symbol>
+  <symbol id="i-wave" viewBox="0 0 24 24"><path d="M2 12c1.7-4.6 3.3-4.6 5 0s3.3 4.6 5 0 3.3-4.6 5 0 3.3 4.6 5 0"/><path d="M2 20h20" opacity=".45"/></symbol>
+  <symbol id="i-sound" viewBox="0 0 24 24"><path d="M3.5 9.5H7L11.5 6v12L7 14.5H3.5z"/><path d="M15 9a4 4 0 0 1 0 6M17.8 6.3a7.8 7.8 0 0 1 0 11.4"/></symbol>
+  <!-- 화학 — 물질의 특성 · 구성 · 기체 (기구 모양은 실제 비율을 따른다: 비커는 부리, 시험관은 둥근 바닥) -->
+  <symbol id="i-beaker" viewBox="0 0 24 24"><path d="M4.5 3.5H18M4.5 3.5 6 5V19a2 2 0 0 0 2 2h8a2 2 0 0 0 2-2V3.5"/><path d="M6 12.5h12M9 7h2M9 9.5h1.5"/></symbol>
+  <symbol id="i-testtube" viewBox="0 0 24 24"><path d="M9 2.5h6M10 2.5V18a2 2 0 0 0 4 0V2.5"/><path d="M10 11.5h4"/></symbol>
+  <symbol id="i-density" viewBox="0 0 24 24"><path d="M8 3.5h8.5M9 3.5v16a1 1 0 0 0 1 1h4.5a1 1 0 0 0 1-1v-16M6.5 21h11.5"/><path d="M9 9.5h6.5M9 15.5h6.5"/><rect x="10.8" y="14.2" width="3" height="2.6" rx=".4"/></symbol>
+  <symbol id="i-boil" viewBox="0 0 24 24"><path d="M6 3v9.5A1.5 1.5 0 0 0 7.5 14h9a1.5 1.5 0 0 0 1.5-1.5V3"/><circle cx="10" cy="10" r=".9"/><circle cx="13.5" cy="7.8" r=".9"/><circle cx="12" cy="11.4" r=".6"/><path d="M12 22c-2 0-3-1.3-3-2.8 0-1.6 1.6-2.4 3-4.2 1.4 1.8 3 2.6 3 4.2 0 1.5-1 2.8-3 2.8z"/></symbol>
+  <symbol id="i-dissolve" viewBox="0 0 24 24"><path d="M6 4v15a2 2 0 0 0 2 2h8a2 2 0 0 0 2-2V4M6 11h12"/><path d="M15 2.5 11 17"/><circle cx="8.8" cy="15" r=".7"/><circle cx="14.2" cy="18" r=".7"/><circle cx="15.6" cy="13.8" r=".7"/></symbol>
+  <symbol id="i-graph" viewBox="0 0 24 24"><path d="M4 3v17h17"/><path d="M6.5 16.5C11 16 15 12.5 19 5"/><path d="M8 20v-1.5M12 20v-1.5M16 20v-1.5"/></symbol>
+  <symbol id="i-crystal" viewBox="0 0 24 24"><path d="M12 2.5 17.5 6v12L12 21.5 6.5 18V6z"/><path d="M6.5 6 12 9.5 17.5 6M12 9.5v12"/></symbol>
+  <symbol id="i-sepfunnel" viewBox="0 0 24 24"><path d="M10.5 2.5h3v2h-3z"/><path d="M10.8 4.5V6C7 7.5 5.8 10.5 7 12.8c.9 1.8 2.6 2.9 4 3.7h2c1.4-.8 3.1-1.9 4-3.7 1.2-2.3 0-5.3-3.8-6.8V4.5"/><path d="M6.7 11h10.6M12 16.5V22M9.8 18.5h4.4"/></symbol>
+  <symbol id="i-distill" viewBox="0 0 24 24"><circle cx="7" cy="16" r="4.2"/><path d="M5.9 12.1V5M8.1 12.1V5M5.2 5h4.6M8.1 7.5l10.7 6.3"/><path d="M17.2 14.2v5.3a1.6 1.6 0 0 0 3.2 0v-5.3"/></symbol>
+  <symbol id="i-tower" viewBox="0 0 24 24"><path d="M9 21.5V6a3 3 0 0 1 6 0v15.5"/><path d="M9 10h6M9 14h6M9 18h6M15 8h4M15 12h4M15 16h4M4 21.5h16"/></symbol>
+  <symbol id="i-filter" viewBox="0 0 24 24"><path d="M5 3h14l-5.8 7.2V14h-2.4v-3.8z"/><path d="M7 15.5V20a1.5 1.5 0 0 0 1.5 1.5h7A1.5 1.5 0 0 0 17 20v-4.5M12 16.2v1.4"/></symbol>
+  <symbol id="i-gas" viewBox="0 0 24 24"><path d="M3 8.5h11v7H3zM1.5 12H3M12.5 8.5v7M12.5 12H20M20 9v6"/><circle cx="5.8" cy="10.6" r=".7"/><circle cx="9" cy="13.4" r=".7"/><circle cx="10.4" cy="10.4" r=".7"/><circle cx="5.6" cy="13.6" r=".7"/></symbol>
+  <symbol id="i-balloon" viewBox="0 0 24 24"><path d="M12 2.5c3.3 0 5.8 2.7 5.8 6.4 0 3.9-2.8 7.1-5.8 7.1s-5.8-3.2-5.8-7.1c0-3.7 2.5-6.4 5.8-6.4z"/><path d="M11.2 16h1.6l-.8 1.3zM12 17.3c0 1.7-1.6 2.2-1.6 4.2"/></symbol>
+  <symbol id="i-periodic" viewBox="0 0 24 24"><path d="M3 4h3v3h3v3h6V7h3V4h3v13H3z"/><path d="M3 10h6M15 10h6M3 13.5h18M6 7v10M9 10v7M15 10v7M18 7v10M8 19.8h10"/></symbol>
+  <symbol id="i-atom" viewBox="0 0 24 24"><circle cx="12" cy="12" r="1.8" fill="currentColor"/><circle cx="12" cy="12" r="5.2"/><circle cx="12" cy="12" r="9"/><circle cx="17.2" cy="12" r="1.1" fill="currentColor"/><circle cx="6.8" cy="12" r="1.1" fill="currentColor"/><circle cx="12" cy="3" r="1.1" fill="currentColor"/><circle cx="12" cy="21" r="1.1" fill="currentColor"/></symbol>
+  <symbol id="i-ion" viewBox="0 0 24 24"><circle cx="8.5" cy="12" r="5.5"/><path d="M6.3 12h4.4M8.5 9.8v4.4"/><circle cx="18" cy="12" r="3.5"/><path d="M16.3 12h3.4"/></symbol>
+  <symbol id="i-ionmove" viewBox="0 0 24 24"><path d="M3.5 5v15M20.5 5v15M7 9.5h8.5M13 7.3l2.5 2.2-2.5 2.2M17 15.5H8.5M11 13.3l-2.5 2.2 2.5 2.2M2 2.5h3M3.5 1v3M19 2.5h3"/></symbol>
+  <symbol id="i-electrolysis" viewBox="0 0 24 24"><path d="M4.5 9v10.5A1.5 1.5 0 0 0 6 21h12a1.5 1.5 0 0 0 1.5-1.5V9M4.5 13.5h15M9 4v13M15 4v13M9 4h2M13 4h2M11 2.3v3.4M13 3.1v1.8"/><circle cx="7.6" cy="15.6" r=".7"/><circle cx="16.4" cy="16.4" r=".7"/></symbol>
+  <symbol id="i-molecule" viewBox="0 0 24 24"><circle cx="12" cy="8.5" r="4"/><circle cx="5" cy="16.5" r="2.6"/><circle cx="19" cy="16.5" r="2.6"/><path d="M9.3 11.4 6.8 14.4M14.7 11.4l2.5 3"/></symbol>
+  <symbol id="i-formula" viewBox="0 0 24 24"><path d="M3.5 6.5v11M9.5 6.5v11M3.5 12h6"/><path d="M11.5 15.2c.2-.9.9-1.4 1.7-1.4.9 0 1.6.6 1.6 1.4 0 1.4-3.3 2.2-3.3 4h3.4"/><circle cx="19" cy="12" r="3.3"/></symbol>
+  <symbol id="i-bond" viewBox="0 0 24 24"><circle cx="8.5" cy="12" r="5.5"/><circle cx="15.5" cy="12" r="5.5"/><circle cx="12" cy="10.2" r=".95" fill="currentColor"/><circle cx="12" cy="13.8" r=".95" fill="currentColor"/></symbol>
+  <symbol id="i-reaction" viewBox="0 0 24 24"><circle cx="5" cy="8" r="2.5"/><circle cx="5" cy="16" r="2.5"/><path d="M9.5 12h4.5M12 10l2 2-2 2"/><circle cx="18.5" cy="10" r="2.5"/><circle cx="18.5" cy="14.6" r="2.5"/></symbol>
+  <!-- 지구 — 지권 · 대기 · 우주 -->
+  <symbol id="i-earth" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M3.5 9h17M3.5 15h17M12 3c-2.6 2.6-3.8 5.8-3.8 9s1.2 6.4 3.8 9M12 3c2.6 2.6 3.8 5.8 3.8 9s-1.2 6.4-3.8 9"/></symbol>
+  <symbol id="i-layers" viewBox="0 0 24 24"><path d="M3 12a9 9 0 0 0 18 0z"/><path d="M6.2 12a5.8 5.8 0 0 0 11.6 0M9.3 12a2.7 2.7 0 0 0 5.4 0"/><path d="M3 12a9 9 0 0 1 18 0" stroke-dasharray="2 2.2"/></symbol>
+  <symbol id="i-gem" viewBox="0 0 24 24"><path d="M7 4h10l4 5-9 11.5L3 9z"/><path d="M3 9h18M9.5 4 8 9l4 11.5L16 9l-1.5-5"/></symbol>
+  <symbol id="i-soil" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="16" rx="1.5"/><path d="M3 9.5c2.5.9 4.5-.6 7 0s4.5.8 7 0c1.6-.5 2.8-.3 4 0M3 14.5c2.5.9 4.5-.6 7 0s4.5.8 7 0c1.6-.5 2.8-.3 4 0"/><circle cx="7.5" cy="17.3" r="1"/><circle cx="14.5" cy="17.6" r="1.2"/><circle cx="11" cy="12" r=".8"/></symbol>
+  <symbol id="i-continent" viewBox="0 0 24 24"><path d="M3.5 5.5c2-.7 3.9.2 4.6 2 .6 1.6-.4 2.9.4 4.3.9 1.6.1 3.6-1.3 5.2-.9 1.1-1.9 2.2-2.3 3.5-.6-2-.7-3.9-1.7-5.6-.8-1.5-1.6-3.4-1.2-5.5.2-1.4 0-3 1.5-3.9z"/><path d="M13.5 4.5c2.6-.4 5.6.5 7 2.7.8 1.3.1 2.6.9 3.9.6 1-.2 2.4-1.3 3.4-1.3 1.2-1.4 3-2.6 4.4-.7.8-1.8.5-2.1-.5-.5-1.7-.1-3.4-1.2-4.9-.8-1-2-1.6-2.2-2.9-.3-1.7 0-3.8 1.5-6.1z"/></symbol>
+  <symbol id="i-cloud" viewBox="0 0 24 24"><circle cx="16.5" cy="7.5" r="3"/><path d="M16.5 2.5V3M21.5 7.5H21M20 4l-.4.4"/><path d="M6.5 19a4 4 0 0 1-.4-8 5.5 5.5 0 0 1 10.4 1.2A3.4 3.4 0 0 1 16.8 19z"/></symbol>
+  <symbol id="i-planet" viewBox="0 0 24 24"><circle cx="12" cy="12" r="5.5"/><path d="M3.8 15.8c-1.6 1.9-2 3.4-1.1 4 1.6 1.1 7.3-1.5 12.8-5.8S23 5 21.4 3.9c-.9-.6-2.5-.1-4.5 1.2"/></symbol>
+  <!-- 생명 -->
+  <symbol id="i-cell" viewBox="0 0 24 24"><ellipse cx="12" cy="12" rx="9" ry="7.5"/><circle cx="13.5" cy="11" r="2.8"/><circle cx="7.5" cy="14" r=".8"/><circle cx="16.5" cy="16" r=".7"/><circle cx="8" cy="9" r=".6"/></symbol>
+  <symbol id="i-leaf" viewBox="0 0 24 24"><path d="M20 4C11 4 5 8.5 5 15c0 1.8.5 3.3 1.4 4.6C16 19.5 20 12 20 4z"/><path d="M4 21c3-5 6.5-8.5 11-11.5"/></symbol>
+  <symbol id="i-dna" viewBox="0 0 24 24"><path d="M7 3c0 4.5 10 7.5 10 12s-2 5.5-2 6M17 3c0 4.5-10 7.5-10 12s2 5.5 2 6"/><path d="M8.5 7h7M8 12h8M9 17h6"/></symbol>
+  <symbol id="i-heart" viewBox="0 0 24 24"><path d="M12 20.5s-8-4.8-8-10.6A4.4 4.4 0 0 1 12 7.3a4.4 4.4 0 0 1 8 2.6c0 5.8-8 10.6-8 10.6z"/></symbol>
+  <!-- 활동 · 모음 -->
+  <symbol id="i-collection" viewBox="0 0 24 24"><rect x="3" y="3" width="8" height="8" rx="1.5"/><rect x="13" y="3" width="8" height="8" rx="1.5"/><rect x="3" y="13" width="8" height="8" rx="1.5"/><rect x="13" y="13" width="8" height="8" rx="1.5"/></symbol>
+  <symbol id="i-quiz" viewBox="0 0 24 24"><path d="M4 4.5h16v11.5H9.5L4 20.5z"/><path d="M10 8.6a2 2 0 1 1 2.6 1.9c-.5.2-.6.6-.6 1.2M12 13.6h.01"/></symbol>
+  <symbol id="i-game" viewBox="0 0 24 24"><path d="M7 7.5h10a4.5 4.5 0 0 1 4.5 4.5v1a3 3 0 0 1-5.4 1.8L15 13.5H9l-1.1 1.3A3 3 0 0 1 2.5 13v-1A4.5 4.5 0 0 1 7 7.5z"/><path d="M7.5 10v3M6 11.5h3M15.5 10.5h.01M17.5 12.5h.01"/></symbol>
+  <symbol id="i-cards" viewBox="0 0 24 24"><rect x="3" y="6" width="10" height="14" rx="1.5" transform="rotate(-8 8 13)"/><rect x="11" y="4" width="10" height="14" rx="1.5"/><path d="M16 9.5v4M14 11.5h4"/></symbol>
+  <symbol id="i-rain" viewBox="0 0 24 24"><path d="M7 14a4 4 0 0 1-.5-8A5.5 5.5 0 0 1 17 6.5 3.8 3.8 0 0 1 17.5 14z"/><path d="M8 17l-1 2.5M12 17l-1 2.5M16 17l-1 2.5"/></symbol>
+  <symbol id="i-spark" viewBox="0 0 24 24"><path d="M11 3.5l1.9 5.1 5.1 1.9-5.1 1.9L11 17.5l-1.9-5.1L4 10.5l5.1-1.9z"/><path d="M18.5 15.5l.8 2 2 .8-2 .8-.8 2-.8-2-2-.8 2-.8z"/></symbol>
+</svg>
+
+<script>
+'use strict';
+/* ============================================================
+   송쌤과학 교사용 실험실
+   ─ 이 파일은 _build/hub.src.html 에서 만든다. 고칠 때는 원본을 고치고 build.py 를 다시 돌린다.
+   ─ 구글 시트를 접속할 때마다 읽어 목록으로 게시한다. 시트에 행을 추가하면 자동 반영(재배포 불필요).
+   ============================================================ */
+const VARIANT = 'teacher';
+
+/* 1) 설정 — 시트나 주소를 바꾸려면 여기만 고친다 */
+const CONFIG = {
+  SHEET_ID: '1QVuEU-SQoX_kEvTFFNW0c2B90sMOy5M5n-QU0SjRMiU',
+  SECTIONS: [
+    { key:'lab',  tabs:['과학'],     gid:'0',          expectHead:/실험|단원|학년/ },
+    { key:'work', tabs:['학교수업'], gid:'1677663949', expectHead:/도구|업무/ },
+  ],
+  HIDE_URL: /songsamscience\.github\.io\/songsamlab(\/|$)/i,   // 이 실험실 자신을 가리키는 행은 목록에서 뺀다
+  NEW_MONTHS: 1,                                               // 최근 한 달 안에 편집(업데이트)한 항목에 NEW
+  STUDENT_URL: 'https://songsamscience.github.io/songsamlab/student/',   // 학생용을 다른 주소에 올리면 이 한 줄만 바꾼다
+  CACHE_KEY: 'ssw-lab-hub-v3',
+  THEME_KEY: 'ssw-theme'                                       // 송쌤과학 시리즈 공통 — 실험실끼리 테마가 이어진다
+};
+
+/* 업무 도우미 아이콘 — 이름에 들어 있는 낱말로 고른다 (위에서부터 먼저 맞는 것) */
+const TOOL_ICONS = [
+  [/교실|학급|출석|모둠/, 'i-classroom'],
+  [/이미지|사진|그림/, 'i-image'],
+  [/점수|배점|계산|성적|통계/, 'i-calc'],
+  [/실험실|스튜디오/, 'i-spark'],
+  [/생기부|생활기록|프롬프트|문서/, 'i-doc'],
+  [/평가|시험|문항|서논술/, 'i-check'],
+  [/디벗|기기|태블릿/, 'i-device']
+];
+
+/* 2) 시트를 못 읽을 때만 보여 주는 스냅샷 (2026.09.13 시트 그대로) */
+const SNAPSHOT_DATE = '2026.09.13';
+const SNAPSHOT = {
+  lab: {
+    headers: ['학년','단원','실험명','주소','편집일'],
+    rows: [
+      ['중1','5.힘의 작용','힘의 3요소','https://songsamscience.github.io/three-force/','2025.11.23.'],
+      ['중1','5.힘의 작용','힘의 크기와 물체의 변화','https://songsamscience.github.io/magnitude-of-force/','2025.11.23.'],
+      ['중1','5.힘의 작용','용수철 탄성력 실험','https://songsamscience.github.io/Spring-force/','2025.11.23.'],
+      ['중1','5.힘의 작용','용수철과 힘의 측정 도구','https://songsamscience.github.io/Force-Measuring-Tool/','2025.11.25.'],
+      ['중1','6.기체의 성질','보일의 법칙 인포그래픽','https://songsamscience.github.io/Boyle-info/','2025.12.1.'],
+      ['중1','6.기체의 성질','샤를의 법칙 인포그래픽','https://songsamscience.github.io/Charles-info/','2025.12.1.'],
+      ['중2','1.물질의 특성','재결정 실험','https://songsamscience.github.io/Fractional-Crystallization/','2026.3.31.'],
+      ['중2','1.물질의 특성','밀도 실험 5종 세트','https://songsamscience.github.io/density/','2026.3.08.'],
+      ['중2','1.물질의 특성','물의 양에 따른 끓는점 비교','https://songsamscience.github.io/Comparison-of-boiling-points-of-water/','2026.3.22.'],
+      ['중2','1.물질의 특성','용해도 실험 3종 세트','https://songsamscience.github.io/Solubility-Experiment/','2026.3.29.'],
+      ['중2','1.물질의 특성','용해도 곡선 분석과 문제풀이','https://songsamscience.github.io/Solubility-Curve/','2026.3.15.'],
+      ['중2','1.물질의 특성','물과 에탄올의 끓는점 비교','https://songsamscience.github.io/boiling-point-comparison/','2026.3.22.'],
+      ['중2','1.물질의 특성','분별깔때기 실험(물과 콩기름의 밀도)','https://songsamscience.github.io/separatory-funnel/','2026.4.01.'],
+      ['중2','1.물질의 특성','에탄올과 물의 혼합물 증류','https://songsamscience.github.io/Distillation-Lab/','2026.4.4.'],
+      ['중2','1.물질의 특성','혼합물 분리 실험 퀴즈(탐구형)','https://songsamscience.github.io/Separating-Mixtures/','2026.4.4.'],
+      ['중2','1.물질의 특성','원유증류탑 분별증류','https://songsamscience.github.io/Crude-Distillation-Unit/','2026.6.4.'],
+      ['중2','1.물질의 특성','물질의 특성 실험 모음 사이트','https://songsamscience.github.io/Properties-of-Matter-Experiment-Collection/','2026.6.6.'],
+      ['중2','2.지권의 변화','지구계 활동 놀이','https://songsamscience.github.io/earth-system-game/','2026.4.10.'],
+      ['중2','2.지권의 변화','지구의 층상 구조','https://songsamscience.github.io/Layered-structure-of-the-Earth/','2026.4.12.'],
+      ['중2','2.지권의 변화','광물의 특성 실험','https://songsamscience.github.io/mineral-experiment/','2026.5.2.'],
+      ['중2','2.지권의 변화','광물,암석 메모리 게임','https://songsamscience.github.io/Minerals-and-Rocks-Memory-Card-Game/','2026.5.17.'],
+      ['중2','2.지권의 변화','풍화와 토양의 생성과정 실험','https://songsamscience.github.io/soil-formation-experiment/','2026.6.6.'],
+      ['중2','2.지권의 변화','대륙 맞추기 실험(대륙이동설)','https://songsamscience.github.io/Continental-drift/','2026.6.7.'],
+      ['중2','2.지권의 변화','지권의 변화 실험 모음 사이트','https://songsamscience.github.io/Geosphere-change-experiments-collection/','2026.7.26.'],
+      ['중2','3.빛과 파동','빛의 반사와 굴절 실험','https://songsamscience.github.io/Reflection-and-refraction-of-light/','2026.6.13.'],
+      ['중2','3.빛과 파동','평면거울에 의한 상','https://songsamscience.github.io/plane-mirror/','2026.6.14.'],
+      ['중2','3.빛과 파동','거울, 렌즈에 의한 빛의 경로 및 상','https://songsamscience.github.io/Mirrors-and-Lenses-Experiment/','2026.6.20.'],
+      ['중2','3.빛과 파동','근시와 원시 렌즈 교정','https://songsamscience.github.io/Myopia-and-Hyperopia-Lens-Correction/','2026.6.24.'],
+      ['중2','3.빛과 파동','빛의 실험','https://songsamscience.github.io/light-lab/','2026.7.5.'],
+      ['중2','3.빛과 파동','영상장치의 색','https://songsamscience.github.io/Video-device-color/','2026.7.10.'],
+      ['중2','3.빛과 파동','파동의 발생과 전달과정','https://songsamscience.github.io/Wave-Generation-and-Propagation/','2026.7.22.'],
+      ['중2','3.빛과 파동','소리 파동 분석 실험','https://songsamscience.github.io/Sound-wave/','2026.7.22.'],
+      ['중2','3.빛과 파동','빛과 파동 실험 모음 사이트','https://songsamscience.github.io/Light-and-Wave-Experiments-Collection/','2026.7.26.'],
+      ['중2','4.물질의 구성','원소 산성비 게임_V2','https://songsamscience.github.io/element-rain-typing-game/','2026.8.22.'],
+      ['중2','4.물질의 구성','주기율표 3분 퀴즈_V2','https://songsamscience.github.io/periodic-table-quiz-game/','2026.8.22.'],
+      ['중2','4.물질의 구성','원자의 구조-보어의 원자 모형','https://songsamscience.github.io/atom-structure/','2026.2.23.'],
+      ['중2','4.물질의 구성','전기분해 실험','https://songsamscience.github.io/electrolysis-experiment/','2026.8.18.'],
+      ['중2','4.물질의 구성','원소기호화 화학식_V2','https://songsamscience.github.io/Element-Symbols-and-Chemical-Formulas/','2026.8.22.'],
+      ['중2','4.물질의 구성','원자와 이온 모형 탐구','https://songsamscience.github.io/atom-and-ion/','2026.8.30.'],
+      ['중2','4.물질의 구성','전기에 의한 양이온과 음이온의 이동','https://songsamscience.github.io/movement-of-cations-and-anions/','2026.9.1.'],
+      ['중2','4.물질의 구성','분자 만들기(제작중)','https://songsamscience.github.io/Building-molecules/','2026.9.1.'],
+      ['중2','4.물질의 구성','주기율표 1,18족 원소의 유사성','https://songsamscience.github.io/Group-1-and-Group-18-in-the-periodic-table/','2026.8.30.'],
+      ['중2','4.물질의 구성','외워야할 화학기호와 화학식 학습사이트','https://songsamscience.github.io/Chemical-symbols-and-formulas-to-memorize/','2026.9.13.'],
+      ['중3','5.운동과 에너지','운동분석사진(다중섬광사진) 제작','https://songsamscience.github.io/multiflash-photograph/','2026.4.12.'],
+      ['중3','5.운동과 에너지','달걀낙하실험','https://songsamscience.github.io/egg-stunt-claude/','2026.5.14.'],
+      ['통합','송쌤과학 가상실험실','송쌤과학 가상실험실 및 학교 업무 도우미','https://songsamscience.github.io/songsamlab/','2026.7.13.'],
+      ['고1','2.물질과 규칙성','이온결합과 공유결합','https://songsamscience.github.io/Ionic-bonding-and-covalent-bonding/','2026.9.13.'],
+      ['통합','오로라 가상실험실','학생용 가상실험실 프롬프트 생성기','https://songsamscience.github.io/Aurora-Virtual-Lab/','2026.7.22.']
+    ]
+  },
+  work: {
+    headers: ['수업 도구','주소','편집일'],
+    rows: [
+      ['송쌤과학 교실 도우미','https://songsamscience.github.io/Classroom-Helper/','2026.4.1.'],
+      ['송쌤과학 이미지 편집기','https://songsamscience.github.io/image-editor/','2026.6.7.'],
+      ['송쌤과학 정기고사 점수배점 계산','https://songsamscience.github.io/Score-distribution-calculation/','2026.6.18.'],
+      ['송쌤과학 생기부 만능프롬프트 제작 프로그램','https://songsamscience.github.io/sgb-prompt/','2026.7.12.'],
+      ['송쌤과학 디벗업무도우미','https://songsamscience.github.io/dbothelper/#/home','2026.8.9.'],
+      ['송쌤과학 서논술형 평가 계획 및 문항 개발','https://songsamscience.github.io/Development-of-descriptive-assessment/','2026.8.28.'],
+      ['송쌤과학 가상실험실 제작 프롬프트 스튜디오','https://songsamscience.github.io/Virtual-Lab-Creation/','2026.9.5.']
+    ]
+  }
+};
+
+/* 3) 상태 */
+const KEYS = CONFIG.SECTIONS.map(s => s.key);
+const state = {
+  data:    Object.fromEntries(KEYS.map(k => [k, []])),
+  status:  Object.fromEntries(KEYS.map(k => [k, 'loading'])),   // loading | ok | empty | stale | error
+  staleAt: Object.fromEntries(KEYS.map(k => [k, null])),
+  f: { grade:'', unit:'', q:'', view:'unit' },                    // 목차·검색·보기 — 주소(?grade=&unit=&q=&view=)와 동기화
+  index: [],
+  pane: 'lab',
+
+  lastSync: null
+};
+const $  = (s, r = document) => r.querySelector(s);
+const $$ = (s, r = document) => Array.from(r.querySelectorAll(s));
+const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({ '&':'&amp;', '<':'&lt;', '>':'&gt;', '"':'&quot;', "'":'&#39;' }[c]));
+const pad = n => String(n).padStart(2, '0');
+const fmt   = d => d ? `${d.getFullYear()}.${pad(d.getMonth() + 1)}.${pad(d.getDate())}` : '';
+const fmtMD = d => d ? `${pad(d.getMonth() + 1)}.${pad(d.getDate())}` : '';
+const iso   = d => `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}`;
+const hhmm  = d => `${pad(d.getHours())}:${pad(d.getMinutes())}`;
+/* NEW 기준일 — 오늘에서 달력으로 한 달 전(예: 9월 13일 → 8월 13일)부터 편집한 항목 */
+const NEW_SINCE = (() => { const d = new Date(); d.setHours(0, 0, 0, 0); d.setMonth(d.getMonth() - CONFIG.NEW_MONTHS); return d; })();
+const isNew = d => !!d && d >= NEW_SINCE;
+const norm  = s => String(s ?? '').replace(/\s+/g, '').toLowerCase();
+const reduceMotion = () => matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+function parseDate(v){
+  const m = String(v || '').match(/(\d{4})\D+(\d{1,2})\D+(\d{1,2})/);
+  if (!m) return null;
+  const d = new Date(+m[1], +m[2] - 1, +m[3]);
+  return isNaN(d) ? null : d;
+}
+/* 학년 순서: 초 → 중 → 고 → 그 밖(통합 등) */
+function gradeRank(g){
+  const m = /^(초|중|고)\s*(\d)/.exec(g || '');
+  return m ? ({ 초:0, 중:10, 고:20 })[m[1]] + Number(m[2]) : (g ? 90 : 99);
+}
+/* '3.빛과 파동' → { no:'3', name:'빛과 파동' } — 번호는 목차 여백에 건다 */
+function splitUnit(u){
+  const m = /^\s*(\d+)\s*[.)]\s*(.+)$/.exec(u || '');
+  return m ? { no:m[1], name:m[2] } : { no:'', name:u || '기타' };
+}
+const unitLabel = u => { const s = splitUnit(u); return s.no ? `${s.no}. ${s.name}` : s.name; };
+
+/* 4) 시트 읽기 — gid를 먼저 쓴다(탭 이름이 어긋나면 구글이 첫 탭을 돌려주는 문제를 피한다) */
+function endpoints(section){
+  const id = CONFIG.SHEET_ID, rid = Date.now(), base = `https://docs.google.com/spreadsheets/d/${id}/gviz/tq?tqx=out:csv;reqId:${rid}`;
+  return [
+    ...(section.gid ? [`${base}&gid=${section.gid}`] : []),
+    ...section.tabs.map(t => `${base}&sheet=${encodeURIComponent(t)}`)
+  ];
+}
+/* 8초 안에 응답이 없으면 끊는다 — 느린 회선에서 로딩이 멈춰 있지 않게 */
+function fetchTimeout(url, ms = 8000){
+  const ctrl = new AbortController();
+  const timer = setTimeout(() => ctrl.abort(), ms);
+  return fetch(url, { cache:'no-store', signal:ctrl.signal }).finally(() => clearTimeout(timer));
+}
+async function loadSection(section){
+  let fetched = false, lastErr = null;
+  for (const url of endpoints(section)){
+    try {
+      const res = await fetchTimeout(url);
+      if (!res.ok){ lastErr = new Error('HTTP ' + res.status); continue; }
+      const text = await res.text();
+      if (!text || /^\s*</.test(text)){ lastErr = new Error('CSV가 아님'); continue; }
+      const table = parseCSV(text);
+      const head = (table[0] || []).join(' ');
+      if (section.expectHead && !section.expectHead.test(head)){ lastErr = new Error('다른 탭의 표: ' + head.slice(0, 40)); continue; }
+      fetched = true;
+      const items = toItems(table);
+      if (items.length) return items;
+    } catch (e){ lastErr = e; }
+  }
+  if (fetched) return [];
+  throw lastErr || new Error('시트를 읽지 못했습니다');
+}
+/* CSV 파서 (따옴표·줄바꿈 포함 셀 지원) */
+function parseCSV(text){
+  const rows = []; let row = [], cell = '', q = false;
+  const s = text.replace(/\r\n?/g, '\n');
+  for (let i = 0; i < s.length; i++){
+    const c = s[i];
+    if (q){
+      if (c === '"'){ if (s[i + 1] === '"'){ cell += '"'; i++; } else q = false; }
+      else cell += c;
+    } else if (c === '"') q = true;
+    else if (c === ','){ row.push(cell); cell = ''; }
+    else if (c === '\n'){ row.push(cell); rows.push(row); row = []; cell = ''; }
+    else cell += c;
+  }
+  if (cell !== '' || row.length){ row.push(cell); rows.push(row); }
+  return rows.filter(r => r.some(v => String(v).trim() !== ''));
+}
+/* 표 → 항목 (머리글 이름이 달라도 알아본다). 시트의 행 순서를 order로 보존한다 */
+function toItems(table){
+  if (!table.length) return [];
+  const isUrl = v => /^https?:\/\//i.test(String(v).trim());
+  const head = table[0].map(v => String(v).trim());
+  const headerless = head.some(isUrl);
+  const body = headerless ? table : table.slice(1);
+  const map = headerless ? guessColumns(body) : mapColumns(head, body);
+  if (map.url < 0) return [];
+  const out = [];
+  body.forEach((r, order) => {
+    const get = k => (map[k] >= 0 && r[map[k]] != null) ? String(r[map[k]]).trim() : '';
+    const url = get('url');
+    if (!isUrl(url) || CONFIG.HIDE_URL.test(url)) return;
+    const dateRaw = get('date');
+    out.push(decorate({
+      grade: get('grade'), unit: get('group'),
+      title: get('title') || url.replace(/^https?:\/\//, '').replace(/\/$/, ''),
+      url, dateRaw, date: parseDate(dateRaw), order, icon: get('icon')
+    }));
+  });
+  return out;
+}
+function mapColumns(head, body){
+  const n = h => h.replace(/\s/g, '').toLowerCase();
+  const find = keys => head.findIndex(h => keys.some(k => n(h).includes(k)));
+  const map = {
+    grade: find(['학년','대상']),
+    group: find(['단원','분류','카테고리','영역','구분','종류']),
+    title: find(['실험명','도구','제목','이름','명칭','프로그램','자료','사이트','앱']),
+    url:   find(['주소','링크','url','link']),
+    date:  find(['편집일','날짜','수정','등록','업데이트','작성']),
+    icon:  find(['아이콘','icon'])                 // 선택 열 — 없으면 실험명으로 자동
+  };
+  if (map.url < 0){
+    const g = guessColumns(body);
+    for (const k of Object.keys(map)) if (map[k] < 0) map[k] = g[k];
+  }
+  if (map.title < 0){
+    for (let i = 0; i < head.length; i++){
+      if ([map.url, map.date, map.grade, map.group].includes(i)) continue;
+      map.title = i; break;
+    }
+  }
+  return map;
+}
+function guessColumns(body){
+  const cols = Math.max(0, ...body.map(r => r.length));
+  const col = i => body.map(r => String(r[i] ?? '').trim());
+  const ratio = (i, re) => { const v = col(i).filter(Boolean); return v.length ? v.filter(x => re.test(x)).length / v.length : 0; };
+  const map = { grade:-1, group:-1, title:-1, url:-1, date:-1, icon:-1 };
+  for (let i = 0; i < cols; i++){
+    if (map.url   < 0 && ratio(i, /^https?:\/\//i) > .6){ map.url = i; continue; }
+    if (map.date  < 0 && ratio(i, /\d{4}\D+\d{1,2}\D+\d{1,2}/) > .6){ map.date = i; continue; }
+    if (map.grade < 0 && ratio(i, /^(중|고|초)\s?\d/) > .6){ map.grade = i; continue; }
+  }
+  const rest = [];
+  for (let i = 0; i < cols; i++){
+    if ([map.url, map.date, map.grade].includes(i)) continue;
+    const v = col(i).filter(Boolean);
+    if (v.length) rest.push({ i, uniq:new Set(v).size });
+  }
+  rest.sort((a, b) => a.uniq - b.uniq);
+  if (rest.length === 1) map.title = rest[0].i;
+  else if (rest.length >= 2){ map.group = rest[0].i; map.title = rest[rest.length - 1].i; }
+  return map;
+}
+
+/* 5) 최근 성공 목록 캐시 — 재방문 때 첫 화면이 바로 뜨고, 시트를 못 읽어도 최근 목록을 유지한다.
+      공개된 링크 목록만 저장한다(학생 입력·개인정보 없음). 저장이 막힌 브라우저에서는 조용히 건너뛴다 */
+function readCache(){
+  try { return JSON.parse(localStorage.getItem(CONFIG.CACHE_KEY)) || null; } catch (e){ return null; }
+}
+function writeCache(key, items){
+  try {
+    const c = readCache() || { t:{}, data:{} };
+    c.t[key] = Date.now();
+    c.data[key] = items.map(({ grade, unit, title, url, dateRaw, order, icon }) => ({ grade, unit, title, url, dateRaw, order, icon }));
+    localStorage.setItem(CONFIG.CACHE_KEY, JSON.stringify(c));
+  } catch (e){ /* 저장 불가 환경 */ }
+}
+const revive = rows => rows.filter(r => r && r.url && !CONFIG.HIDE_URL.test(r.url))
+  .map((r, i) => decorate({ ...r, order: r.order ?? i, date: parseDate(r.dateRaw) }));
+
+/* 과학 영역 — 단원명(없으면 실험명)으로 고른다. 순서가 중요하다(화학 반응·자극과 반응처럼 겹치는 낱말 때문) */
+const DOMAINS = [
+  ['chem',  '화학', /물질|기체|원소|원자|이온|분자|화학|용해|밀도|혼합물|산\s*염기|규칙성/],
+  ['earth', '지구', /지권|지구|암석|광물|풍화|토양|대륙|판\s*구조|대기|기권|날씨|수권|해양|해수|태양|천체|별|우주|달의/],
+  ['life',  '생명', /생물|생명|세포|광합성|소화|호흡|순환|배설|자극|신경|유전|생식|생태|식물|동물/],
+  ['phy',   '물리', /힘|운동|에너지|빛|파동|소리|전기|자기|열|속력|역학/]
+];
+const DOMAIN_LABEL = { chem:'화학', earth:'지구', life:'생명', phy:'물리', etc:'통합' };
+function domainOf(it){
+  for (const src of [it.unit, it.title]) for (const [key, , re] of DOMAINS) if (re.test(src || '')) return key;
+  return 'etc';
+}
+/* 실험 아이콘 — 실험명(없으면 단원명)에 든 낱말로 고른다. 위에서부터 먼저 맞는 것.
+   시트에 '아이콘' 열을 만들고 아래 이름(예: prism)을 적으면 그 아이콘이 먼저다 */
+const LAB_ICONS = [
+  ['collection', /모음\s*사이트|모음집/],   ['rain', /산성비/],              ['cards', /메모리|카드/],
+  ['periodic', /주기율표|족\s*원소|\d+\s*족/], ['ionmove', /이온.*이동|양이온|음이온/], ['bond', /결합/],
+  ['ion', /이온/],                           ['atom', /원자/],                ['molecule', /분자/],
+  ['formula', /원소\s*기호|화학식|화학\s*기호/], ['electrolysis', /전기\s*분해/], ['crystal', /결정/],
+  ['sepfunnel', /깔때기/],                   ['tower', /증류탑|원유/],        ['distill', /증류/],
+  ['filter', /혼합물|분리|거름/],            ['graph', /곡선|그래프/],        ['dissolve', /용해/],
+  ['boil', /끓는점|녹는점|어는점|가열/],     ['density', /밀도/],             ['gas', /보일|압력/],
+  ['balloon', /샤를/],                       ['spring', /용수철|탄성/],       ['force', /힘/],
+  ['motion', /다중\s*섬광|운동\s*분석|속력|등속|자유\s*낙하/], ['egg', /달걀|낙하|충격/],
+  ['eye', /근시|원시|시력|눈의/],            ['lens', /렌즈/],                ['mirror', /거울/],
+  ['refract', /반사|굴절/],                  ['rgb', /영상\s*장치|빛의\s*합성|색/], ['sound', /소리|음파|진동수/],
+  ['wave', /파동/],                          ['prism', /빛|분산|프리즘/],     ['bulb', /전기|회로|전류|전압|저항/],
+  ['magnet', /자기|자석/],                   ['thermo', /열|온도/],           ['energy', /에너지/],
+  ['layers', /층상|내부\s*구조/],            ['gem', /광물|암석/],            ['soil', /풍화|토양|침식/],
+  ['continent', /대륙|판\s*구조|지진|화산/], ['earth', /지구/],               ['cloud', /날씨|기압|구름|대기|기상|바람/],
+  ['planet', /태양계|행성|천체|별|우주|은하|달의|위성/], ['cell', /세포/],     ['leaf', /광합성|식물|잎/],
+  ['dna', /유전|염색체|dna/i],               ['heart', /소화|순환|호흡|배설|심장|혈액/], ['testtube', /산\s*염기|중화|지시약|ph/i],
+  ['reaction', /반응/],                      ['spark', /오로라|프롬프트|생성기/], ['quiz', /퀴즈|문제/],
+  ['game', /게임|놀이/]
+];
+const ICON_IDS = new Set([...LAB_ICONS.map(([id]) => id), 'beaker', 'flask', 'testtube']);
+const DOMAIN_ICON = { phy:'energy', chem:'beaker', life:'leaf', earth:'earth', etc:'flask' };
+function iconOf(it){
+  const own = String(it.icon || '').trim().toLowerCase().replace(/^i-/, '');
+  if (ICON_IDS.has(own)) return 'i-' + own;
+  for (const src of [it.title, it.unit]) for (const [id, re] of LAB_ICONS) if (re.test(src || '')) return 'i-' + id;
+  return 'i-' + DOMAIN_ICON[it.dom || domainOf(it)];
+}
+function decorate(it){ it.dom = domainOf(it); it.ic = iconOf(it); return it; }
+
+/* 학년 → 단원 목차 만들기 (학년은 초·중·고 순, 단원은 번호 순, 같으면 시트에 처음 나온 순) */
+function buildIndex(items){
+  const grades = new Map();
+  items.forEach(it => {
+    if (!grades.has(it.grade)) grades.set(it.grade, { grade:it.grade, rank:gradeRank(it.grade), count:0, first:it.order, units:new Map() });
+    const g = grades.get(it.grade); g.count++;
+    if (!g.units.has(it.unit)){ const s = splitUnit(it.unit); g.units.set(it.unit, { unit:it.unit, no:s.no, name:s.name, count:0, fresh:0, first:it.order, dom:it.dom }); }
+    const u = g.units.get(it.unit);
+    u.count++;
+    if (isNew(it.date)) u.fresh++;
+  });
+  const byNo = s => s === '' ? 999 : Number(s);
+  return [...grades.values()]
+    .sort((a, b) => a.rank - b.rank || a.first - b.first)
+    .map(g => ({ ...g, unitList:[...g.units.values()].sort((a, b) => byNo(a.no) - byNo(b.no) || a.first - b.first) }));
+}
+
+/* ============================================================
+   테마 (세 페이지 공통) — 스위치는 <html data-theme> 하나, 저장 키는 시리즈 공통 (§6.5-5)
+      첫 로드에서는 저장하지 않는다: 누른 적이 없으면 라이트 기본값이 유지된다
+   ============================================================ */
+const btnTheme = $('#btn-theme');
+function applyTheme(t, save = true){
+  const root = document.documentElement;
+  root.dataset.theme = t;
+  if (save){ try { localStorage.setItem(CONFIG.THEME_KEY, t); } catch (e){} }
+  const next = t === 'dark' ? '라이트' : '다크';
+  btnTheme.setAttribute('aria-label', `${next} 모드로 전환`);
+  btnTheme.title = `${next} 모드로 전환 (D)`;
+  btnTheme.querySelector('use').setAttribute('href', t === 'dark' ? '#i-moon' : '#i-sun');
+  const meta = $('meta[name="theme-color"]');
+  if (meta) meta.setAttribute('content', getComputedStyle(root).getPropertyValue('--surface-0').trim());
+}
+function toggleTheme(){ applyTheme(document.documentElement.dataset.theme === 'dark' ? 'light' : 'dark'); }
+/* 다른 탭(교사용↔학생용·실험실)에서 바꾸면 여기도 따라간다 */
+addEventListener('storage', e => {
+  if (e.key === CONFIG.THEME_KEY && (e.newValue === 'dark' || e.newValue === 'light')) applyTheme(e.newValue, false);
+});
+
+applyTheme(document.documentElement.dataset.theme === 'dark' ? 'dark' : 'light', false);   // 첫 로드: 아이콘·이름만 맞추고 저장하지 않는다
+
+/* ============================================================
+   6) 그리기
+   ============================================================ */
+const icon = (id, cls = '') => `<svg class="ico ${cls}" aria-hidden="true"><use href="#${id}"></use></svg>`;
+const NEW_TAG = '<span class="sr"> </span><span class="new">NEW</span>';   // 읽을 때 앞말과 붙지 않게 띄어 준다
+const domStyle = d => `style="--dom:var(--d-${d || 'etc'})"`;
+const DOMAIN_ORDER = ['phy', 'chem', 'life', 'earth', 'etc'];
+
+/* 검색어 강조 — 띄어쓰기를 무시하고 찾은 범위를 원문 위치로 되돌려 <mark>로 감싼다 */
+function hl(text, q){
+  const nq = norm(q);
+  if (!nq) return esc(text);
+  const map = []; let flat = '';
+  for (let i = 0; i < text.length; i++){ if (/\s/.test(text[i])) continue; map.push(i); flat += text[i].toLowerCase(); }
+  let out = '', last = 0, from = 0, at;
+  while ((at = flat.indexOf(nq, from)) !== -1){
+    const s = map[at], e = map[at + nq.length - 1] + 1;
+    out += esc(text.slice(last, s)) + '<mark>' + esc(text.slice(s, e)) + '</mark>';
+    last = e; from = at + nq.length;
+  }
+  return out + esc(text.slice(last));
+}
+const matches = (it, nq) => !nq || norm(`${it.title}${it.unit}${it.grade}`).includes(nq);
+function visibleItems(f = state.f){
+  const { grade, unit } = f, nq = norm(f.q);
+  return state.data.lab.filter(it => (!grade || it.grade === grade) && (!unit || it.unit === unit) && matches(it, nq));
+}
+function hrefFor(patch){
+  const s = paramsFor({ ...state.f, ...patch }).toString();
+  return esc(location.pathname + (s ? '?' + s : ''));
+}
+
+function renderStats(){
+  const lab = state.data.lab.length;
+  $('#st-lab').textContent = lab || '–';
+  $('#labs-n').textContent = lab || '';
+
+  const work = state.data.work.length;
+  $('#st-work').textContent = work || '–';
+  $('#tools-n').textContent = work || '';
+  $('#sw-lab').textContent = lab || '';
+  $('#sw-work').textContent = work || '';
+
+  const dates = [...state.data.lab, ...state.data.work].map(i => i.date).filter(Boolean);
+  $('#st-last').textContent = dates.length ? fmt(new Date(Math.max(...dates))) : '–';
+  const fresh = state.data.lab.filter(i => isNew(i.date)).length;
+  $('#st-new').textContent = fresh ? `${fresh}` : '0';
+}
+
+/* 목차 레일 (넓은 화면) — 단원마다 영역 색 점, 새 실험이 있으면 작은 표시 */
+function renderTOC(){
+  const toc = $('#toc');
+  if (!state.index.length){
+    toc.innerHTML = `<p class="toc__label">목차</p>` + (state.status.lab === 'loading' ? '<div class="sk"></div>'.repeat(7) : '');
+    return;
+  }
+  const link = (cls, g, u, label, n) =>
+    `<a class="${cls}" href="${hrefFor({ grade:g, unit:u })}" data-grade="${esc(g)}" data-unit="${esc(u)}">${label}<span class="n">${n}<span class="sr">개</span></span></a>`;
+  let h = `<p class="toc__label" aria-hidden="true">목차</p><ul role="list">`;
+  h += `<li>${link('toc__all', '', '', '<span>전체</span>', state.data.lab.length)}</li>`;
+  state.index.forEach(g => {
+    h += `<li class="toc__g">${link('toc__grade', g.grade, '', `<span>${esc(g.grade || '기타')}</span>`, g.count)}<ul role="list">`;
+    g.unitList.forEach(u => {
+      const label = `<span class="dot" ${domStyle(u.dom)} aria-hidden="true"></span><span class="no" aria-hidden="true">${esc(u.no)}</span>` +
+        `<span class="nm">${esc(u.name)}${u.fresh ? `<span class="fresh" title="최근 한 달 새 실험 ${u.fresh}개"><span class="sr"> 새 실험 ${u.fresh}개</span></span>` : ''}</span>`;
+      h += `<li>${link('toc__unit', g.grade, u.unit, label, u.count)}</li>`;
+    });
+    h += `</ul></li>`;
+  });
+  h += `</ul>`;
+  const doms = DOMAIN_ORDER.filter(d => state.data.lab.some(i => i.dom === d));
+  h += `<div class="legend"><p>아이콘 색은 과학 영역</p><ul role="list">${
+    doms.map(d => `<li ${domStyle(d)}><span class="dot" aria-hidden="true"></span>${DOMAIN_LABEL[d]}</li>`).join('')}</ul></div>`;
+  toc.innerHTML = h;
+  markCurrent();
+}
+/* 가로 칩 (좁은 화면) — 학년 줄 + 고른 학년의 단원 줄 */
+function renderChips(){
+  const bar = $('#chipbar');
+  if (!state.index.length){ bar.innerHTML = ''; return; }
+  const { grade, unit } = state.f;
+  const chip = (g, u, label, n, on) =>
+    `<a class="chip" href="${hrefFor({ grade:g, unit:u })}" data-grade="${esc(g)}" data-unit="${esc(u)}"${on ? ' aria-current="true"' : ''}>${label}<span class="n">${n}</span></a>`;
+  let h = `<div class="chips" role="group" aria-label="학년">` +
+    chip('', '', '전체', state.data.lab.length, !grade && !unit) +
+    state.index.map(g => chip(g.grade, '', esc(g.grade || '기타'), g.count, grade === g.grade && !!grade)).join('') + `</div>`;
+  const g = state.index.find(x => x.grade === grade && grade);
+  if (g && g.unitList.length > 1){
+    h += `<div class="chips" role="group" aria-label="${esc(g.grade)} 단원">` +
+      chip(g.grade, '', `${esc(g.grade)} 전체`, g.count, !unit) +
+      g.unitList.map(u => chip(g.grade, u.unit,
+        `<span class="dot" ${domStyle(u.dom)} aria-hidden="true"></span>` + (u.no ? `<span class="no">${esc(u.no)}</span>` : '') + esc(u.name),
+        u.count, unit === u.unit)).join('') + `</div>`;
+  }
+  bar.innerHTML = h;
+  /* 고른 칩을 줄 가운데로 — 칩 줄만 가로로 옮긴다(scrollIntoView는 페이지까지 끌어올린다) */
+  $$('.chips', bar).forEach(row => {
+    const on = $('.chip[aria-current="true"]', row);
+    if (on) row.scrollLeft = Math.max(0, on.offsetLeft - (row.clientWidth - on.offsetWidth) / 2);
+  });
+}
+/* 목차의 현재 위치만 바꾼다 — DOM을 새로 만들지 않아 포커스가 그 자리에 남는다 */
+function markCurrent(){
+  const { grade, unit } = state.f;
+  $$('#toc a[data-grade]').forEach(a => {
+    const on = a.dataset.grade === grade && a.dataset.unit === unit;
+    if (on) a.setAttribute('aria-current', 'true'); else a.removeAttribute('aria-current');
+    a.setAttribute('href', hrefFor({ grade:a.dataset.grade, unit:a.dataset.unit }).replace(/&amp;/g, '&'));
+  });
+}
+function renderNav(full){
+  if (full) renderTOC(); else markCurrent();
+  renderChips();
+  $$('.seg [data-view]').forEach(b => b.setAttribute('aria-pressed', String(b.dataset.view === state.f.view)));
+}
+
+function renderCount(n){
+  const { grade, unit } = state.f, q = state.f.q.trim();
+  const scope = unit ? [grade, unitLabel(unit)].filter(Boolean).join(' › ') : (grade || '전체');
+  $('#count').innerHTML = q
+    ? `<b>‘${esc(q)}’</b> ${n}개${grade || unit ? ` · ${esc(scope)}에서` : ''}`
+    : `<b>${esc(scope)}</b> · ${n}개`;
+}
+/* 실험 타일 — [영역 색 아이콘] 실험명 / 날짜·NEW (최신순·새 실험 선반에서는 학년·단원도) */
+function tile(it, { meta = false, newTag = true } = {}){
+  const where = meta ? [it.grade, unitLabel(it.unit)].filter(Boolean).join(' · ') : '';
+  return `<li class="item" ${domStyle(it.dom)}>
+    <span class="item__ic" title="${DOMAIN_LABEL[it.dom]}">${icon(it.ic)}</span>
+    <div class="item__body">
+      <a class="item__link" href="${esc(it.url)}" target="_blank" rel="noopener noreferrer"><span class="item__t">${hl(it.title, state.f.q)}</span><span class="sr"> (새 창)</span></a>
+      <p class="item__m">${where ? `<span class="item__where">${esc(where)}</span>` : ''}${it.date ? `<time datetime="${iso(it.date)}">${meta ? fmtMD(it.date) : fmt(it.date)}</time>` : ''}${newTag && isNew(it.date) ? NEW_TAG : ''}</p>
+    </div>
+    <span class="item__act">
+      <button type="button" class="tbtn" data-copy="${esc(it.url)}" data-name="${esc(it.title)}" aria-label="${esc(it.title)} 링크 복사" title="링크 복사">${icon('i-copy')}</button>
+      <button type="button" class="tbtn" data-qr="${esc(it.url)}" data-name="${esc(it.title)}" aria-haspopup="dialog" aria-label="${esc(it.title)} QR 코드 크게 보기" title="QR 코드 크게 보기">${icon('i-qr')}</button>
+    </span>
+  </li>`;
+}
+
+/* 단원별 — 학년 굵은 선 › 단원 머리(영역 색 번호) › 실험 타일 */
+function unitHTML(items){
+  const byG = new Map();
+  items.forEach(it => {
+    if (!byG.has(it.grade)) byG.set(it.grade, new Map());
+    const m = byG.get(it.grade);
+    if (!m.has(it.unit)) m.set(it.unit, []);
+    m.get(it.unit).push(it);
+  });
+  const showGrade = !state.f.grade, uh = showGrade ? 'h4' : 'h3';
+  let h = '';
+  state.index.forEach(g => {
+    const um = byG.get(g.grade);
+    if (!um) return;
+    const n = [...um.values()].reduce((s, a) => s + a.length, 0);
+    h += `<section class="grp" aria-label="${esc(g.grade || '기타')} ${n}개">`;
+    if (showGrade) h += `<h3 class="grp__h"><span>${esc(g.grade || '기타')}</span><span class="n">${n}개</span></h3>`;
+    g.unitList.forEach(u => {
+      const rows = um.get(u.unit);
+      if (!rows) return;
+      h += `<div class="unit" ${domStyle(u.dom)}>
+        <div class="unit__head">
+          <${uh} class="unit__h"><span class="unit__no">${esc(u.no)}</span><span class="unit__nm">${hl(u.name, state.f.q)}</span></${uh}>
+          <span class="unit__n">${DOMAIN_LABEL[u.dom]} · ${rows.length}개</span>
+          <button type="button" class="unit__send" data-send-grade="${esc(g.grade)}" data-send-unit="${esc(u.unit)}" aria-haspopup="dialog"
+            aria-label="${esc(unitLabel(u.unit))} 단원을 학생에게 보내기" title="이 단원만 학생에게 보내기 (QR·링크)">${icon('i-qr')}<span>보내기</span></button>
+        </div>
+        <ul class="items" role="list">${rows.map(it => tile(it)).join('')}</ul></div>`;
+    });
+    h += `</section>`;
+  });
+  return h;
+}
+/* 최신순 — 편집한 달로 묶는다 */
+function recentHTML(items){
+  const t = it => it.date ? it.date.getTime() : -1;
+  const sorted = [...items].sort((a, b) => t(b) - t(a) || a.order - b.order);
+  const groups = new Map();
+  sorted.forEach(it => {
+    const k = it.date ? `${it.date.getFullYear()}년 ${it.date.getMonth() + 1}월` : '날짜 없음';
+    if (!groups.has(k)) groups.set(k, []);
+    groups.get(k).push(it);
+  });
+  let h = '';
+  groups.forEach((arr, k) => {
+    h += `<section class="grp" aria-label="${k} ${arr.length}개"><h3 class="grp__h"><span>${k}</span><span class="n">${arr.length}개</span></h3>
+      <ul class="items items--flat" role="list">${arr.map(it => tile(it, { meta:true })).join('')}</ul></section>`;
+  });
+  return h;
+}
+/* 새로 올라온 실험 — 필터·검색이 없는 단원별 첫 화면에만, 최근 한 달 편집분 4개까지(나머지는 '모두 보기' → 최신순) */
+function shelfHTML(){
+  if (state.f.grade || state.f.unit || state.f.q.trim() || state.f.view !== 'unit') return '';
+  const t = it => it.date ? it.date.getTime() : 0;
+  const fresh = state.data.lab.filter(it => isNew(it.date)).sort((a, b) => t(b) - t(a) || a.order - b.order);
+  if (!fresh.length) return '';
+  const show = fresh.slice(0, 4);
+  return `<section class="shelf" aria-labelledby="shelf-h">
+    <div class="shelf__head">
+      <h3 id="shelf-h"><span class="new">NEW</span> 새로 올라온 실험</h3>
+      <span class="shelf__sub">최근 한 달 · ${fresh.length}개</span>
+      ${fresh.length > show.length ? `<button type="button" class="shelf__more" data-view="recent">${fresh.length}개 모두 보기</button>` : ''}
+    </div>
+    <ul class="items items--flat" role="list">${show.map(it => tile(it, { meta:true, newTag:false })).join('')}</ul>
+  </section>`;
+}
+function noResultsHTML(){
+  const { grade, unit } = state.f, q = state.f.q.trim(), nq = norm(q);
+  const inAll = nq ? state.data.lab.filter(it => matches(it, nq)).length : 0;
+  let btns = '';
+  if ((grade || unit) && inAll) btns += `<button type="button" class="btn btn--primary" data-act="search-all">전체에서 ‘${esc(q)}’ 찾기 · ${inAll}개</button>`;
+  if (q) btns += `<button type="button" class="btn" data-act="clear-q">검색어 지우기</button>`;
+  if (grade || unit) btns += `<button type="button" class="btn" data-act="reset">전체 목록 보기</button>`;
+  return `<div class="empty">
+    <h3>${q ? `‘${esc(q)}’에 맞는 실험이 없어요` : '이 목록을 찾지 못했어요'}</h3>
+    <p>${q ? '낱말을 짧게 줄이거나 단원 이름으로 찾아보세요. 띄어쓰기는 상관없어요.' : '단원 이름이 바뀌었을 수 있어요. 전체 목록에서 찾아보세요.'}</p>
+    <div class="empty__btns">${btns}</div></div>`;
+}
+function renderList(){
+  const list = $('#list'), items = state.data.lab;
+  if (!items.length){
+    if (state.status.lab === 'loading'){
+      $('#count').textContent = '목록을 불러오는 중…';
+      list.innerHTML = '<div class="sk sk--h"></div>' + [62, 48, 70, 55, 66, 44].map(w => `<div class="sk" style="width:${w}%"></div>`).join('');
+    } else {
+      $('#count').textContent = '';
+      list.innerHTML = `<div class="empty"><h3>아직 올라온 실험이 없어요</h3><p>${
+        VARIANT === 'teacher' ? '시트 ‘과학’ 탭 첫 줄에 머리글을 두고 그 아래에 실험 링크를 적으면 여기에 바로 올라와요.' : '조금 뒤에 다시 들어와 주세요.'}</p>
+        <div class="empty__btns"><button type="button" class="btn" data-act="retry">다시 불러오기</button></div></div>`;
+    }
+    return;
+  }
+  const vis = visibleItems();
+  renderCount(vis.length);
+  list.innerHTML = !vis.length ? noResultsHTML() : shelfHTML() + (state.f.view === 'recent' ? recentHTML(vis) : unitHTML(vis));
+}
+
+function renderTools(){
+  const ul = $('#toollist'), items = state.data.work;
+  if (!items.length){
+    ul.innerHTML = state.status.work === 'loading'
+      ? '<li class="sk"></li>'.repeat(5)
+      : `<li class="tools__note">아직 올라온 도구가 없어요. 시트 ‘학교수업’ 탭에 적으면 여기에 올라와요.</li>`;
+    return;
+  }
+  ul.innerHTML = items.map(it => {
+    const ic = (TOOL_ICONS.find(([re]) => re.test(it.title)) || [0, 'i-toolbox'])[1];
+    const name = it.title.replace(/^송쌤과학\s+/, '');      // 머리의 브랜드명은 상단 표식과 겹치므로 목록에서만 뺀다
+    return `<li><a class="tool" href="${esc(it.url)}" target="_blank" rel="noopener noreferrer" title="${esc(it.title)}">
+      <span class="tool__ic">${icon(ic)}</span>
+      <span class="tool__t">${esc(name)}${isNew(it.date) ? NEW_TAG : ''}</span>
+      ${icon('i-ext', 'tool__ext')}<span class="sr"> (새 창)</span></a></li>`;
+  }).join('');
+}
+function setSync(kind){
+  const el = $('#sync'), t = state.lastSync;
+  el.dataset.state = kind;
+  $('#sync-txt').textContent = kind === 'busy' ? '시트 확인 중' : kind === 'stale' ? '시트 연결 안 됨' : (t ? `${hhmm(t)} 기준` : '');
+  el.title = kind === 'ok' && t ? `구글 시트에서 ${hhmm(t)}에 불러온 목록` : '';
+}
+function updateSendBtn(){
+  const b = $('#btn-send'), on = !!(state.f.grade || state.f.unit || state.f.q.trim());
+  b.classList.toggle('btn--primary', on);      // 목록을 거른 뒤에만 Primary로 올린다 (§8.1 단계별 Primary 교대)
+  b.title = on ? '지금 거른 목록을 학생용 실험실로 보내기 (QR·링크)' : '학생용 실험실 주소를 QR로 보여 주기';
+}
+
+function renderNotice(){
+  const el = $('#notice');
+  const stale = KEYS.filter(k => state.status[k] === 'stale');
+  if (!stale.length){ el.hidden = true; el.innerHTML = ''; return; }
+  const at = stale.map(k => state.staleAt[k]).find(Boolean);
+  const basis = at ? `${fmt(at)} ${hhmm(at)}에 저장해 둔 목록` : `${SNAPSHOT_DATE} 기준 목록`;
+  el.innerHTML = `${icon('i-alert')}<p>${VARIANT === 'teacher'
+      ? `<b>시트에 연결하지 못해</b> ${basis}을 보여 주고 있어요. 방금 추가한 행은 아직 안 보일 수 있어요.`
+      : `<b>인터넷 연결이 불안정해</b> ${basis}을 보여 주고 있어요.`}</p>
+    <button type="button" class="btn" data-act="retry">다시 불러오기</button>`;
+  el.hidden = false;
+}
+
+function renderAll(){
+  state.index = buildIndex(state.data.lab);
+  renderStats();
+  renderNav(true);
+  renderList();
+  renderNotice();
+  renderTools(); updateSendBtn();
+
+}
+
+/* ============================================================
+   7) 주소 상태 — 학년·단원·검색어·보기를 주소에 담는다 (§13.5 ④)
+      목차·칩·보기 전환은 기록을 남겨 뒤로 가기 = 필터 되돌리기, 타이핑은 기록을 덮어쓴다
+   ============================================================ */
+function paramsFor(f, extra = {}){
+  const p = new URLSearchParams();
+  if (f.grade) p.set('grade', f.grade);
+  if (f.unit)  p.set('unit', f.unit);
+  const q = String(f.q || '').trim();
+  if (q) p.set('q', q);
+  if (f.view === 'recent') p.set('view', 'recent');
+  for (const [k, v] of Object.entries(extra)) if (v) p.set(k, v);
+  return p;
+}
+function readURL(){
+  const p = new URLSearchParams(location.search);
+  state.f = { grade:p.get('grade') || '', unit:p.get('unit') || '', q:p.get('q') || '', view:p.get('view') === 'recent' ? 'recent' : 'unit' };
+  state.pane = p.get('pane') === 'tools' ? 'tools' : 'lab';
+
+  $('#q').value = state.f.q;
+}
+function syncURL(push){
+  const s = paramsFor(state.f, { pane: state.pane === 'tools' ? 'tools' : '' }).toString();
+  if (s === new URLSearchParams(location.search).toString()) return;      // 같은 상태면 기록을 쌓지 않는다
+  try { history[push ? 'pushState' : 'replaceState'](null, '', location.pathname + (s ? '?' + s : '') + location.hash); } catch (e){}
+}
+const filterKey = () => [state.f.grade, state.f.unit, state.f.q.trim()].join('');
+function setFilter(patch, { push = true, scroll = true } = {}){
+  const before = filterKey();
+  Object.assign(state.f, patch);
+
+  syncURL(push);
+  renderNav(false);
+  renderList();
+  updateSendBtn();
+
+  if (scroll) keepListInView();
+}
+function clearQuery(){
+  const q = $('#q');
+  if (q.value || state.f.q){ q.value = ''; setFilter({ q:'' }, { push:false, scroll:false }); }
+  q.focus();
+}
+/* 목록 머리가 상단 바 뒤로 올라가 있으면 목록 처음이 보이게 내린다 */
+function keepListInView(){
+  const head = $('.listhead');
+  if (!head || !head.offsetParent) return;
+  const barH = $('#bar').offsetHeight, top = head.getBoundingClientRect().top;
+  if (top < barH) window.scrollBy({ top:top - barH - 12, behavior:reduceMotion() ? 'auto' : 'smooth' });
+}
+function focusSearch(){
+  if (getComputedStyle($('#labs')).display === 'none') setPane('lab', true);
+  const q = $('#q'), r = q.getBoundingClientRect(), barH = $('#bar').offsetHeight;
+  if (r.top < barH || r.bottom > innerHeight) window.scrollBy({ top:r.top - barH - 16, behavior:reduceMotion() ? 'auto' : 'smooth' });
+  q.focus({ preventScroll:true });
+  q.select();
+}
+
+let announceT;
+function announce(msg){
+  const el = $('#live');
+  el.textContent = '';
+  clearTimeout(announceT);
+  announceT = setTimeout(() => { el.textContent = msg; }, 60);
+}
+
+/* ============================================================
+   8) 교사용 — 학생에게 보내기 · QR · 링크 복사
+   ============================================================ */
+/* 학생용 주소: 같은 저장소의 형제 폴더(…/teacher/ → …/student/)면 스스로 계산하고, 아니면 설정값을 쓴다 */
+function studentBase(){
+  if (/^https?:$/.test(location.protocol) && /\/teacher\/(index\.html)?$/i.test(location.pathname))
+    return new URL('../student/', location.href).href;
+  return CONFIG.STUDENT_URL;
+}
+function sendURL(f = state.f){
+  const filtered = !!(f.grade || f.unit || String(f.q || '').trim());
+  const s = paramsFor(f, { from:filtered ? 't' : '' }).toString();
+  return studentBase() + (s ? '?' + s : '');
+}
+function setPane(p, push){
+  state.pane = p === 'tools' ? 'tools' : 'lab';
+  $('#layout').dataset.pane = state.pane;
+  $$('.switch [data-pane]').forEach(b => b.setAttribute('aria-pressed', String(b.dataset.pane === state.pane)));
+  syncURL(push);
+}
+/* 지금 거른 목록(또는 단원 머리의 '보내기'가 넘긴 단원)을 학생용 주소·QR·목록 글로 보낸다 */
+function openSend(trigger, f = state.f){
+  const { grade, unit } = f, q = String(f.q || '').trim();
+  const where = [grade, unit && unitLabel(unit)].filter(Boolean).join(' › ');
+  const desc = [where, q && `검색어 ‘${q}’`].filter(Boolean).join(' · ');
+  const items = visibleItems(f), url = sendURL(f);
+  /* 알림장·클래스룸에 붙여 넣는 글 — 첫 줄은 학생용 목록 주소, 아래는 실험마다 이름과 바로 가는 주소 */
+  const list = [`[송쌤과학 학생용 실험실] ${desc || '전체'} (${items.length}개)`, url, '',
+    ...items.map((it, i) => `${i + 1}. ${it.title}\n   ${it.url}`)].join('\n');
+  openQR({
+    title: unit && f !== state.f ? `${unitLabel(unit)} 보내기` : '학생에게 보내기',
+    sub: desc ? `학생용 실험실이 ${desc} — ${items.length}개 실험만 보이게 열려요.`
+              : `학생용 실험실 전체 목록(${state.data.lab.length}개)이 열려요.`,
+    url, trigger, list
+  });
+}
+const safeDecode = s => { try { return decodeURIComponent(s.replace(/\+/g, ' ')); } catch (e){ return s; } };
+
+const dlg = $('#dlg');
+let qrTrigger = null, downOnBackdrop = false;
+function openQR({ title, sub, url, trigger, list = '' }){
+  qrTrigger = trigger || document.activeElement;
+  const lb = $('#dlg-list');
+  resetCopyBtn(lb);
+  lb.hidden = !list;                                          // 목록 복사는 목록을 보낼 때만
+  lb.dataset.copy = list;
+  lb.dataset.name = '실험 목록';
+  $('#dlg-title').textContent = title;
+  $('#dlg-sub').textContent = sub;
+  let u = null;
+  try { u = new URL(url); } catch (e){}
+  const main = u ? u.host + u.pathname : url;              // 짧은 주소는 QR 성공 여부와 무관하게 항상 크게 (§13.5 ②)
+  const wrap = s => esc(s).replace(/\//g, '/<wbr>').replace(/&amp;/g, '<wbr>&amp;');   // 줄이 넘치면 / 와 & 에서 끊는다
+  $('#dlg-url').innerHTML = wrap(main) + (u && u.search ? `<small>${wrap(safeDecode(u.search))}</small>` : '');
+  $('#dlg-open').href = url;
+  const cp = $('#dlg-copy');
+  resetCopyBtn(cp);
+  cp.dataset.copy = url;
+  cp.dataset.name = title;
+  if (!dlg.open){
+    if (typeof dlg.showModal === 'function') dlg.showModal(); else dlg.setAttribute('open', '');
+  }
+  drawQR(url, main);
+  $('#dlg-close').focus();
+}
+function closeQR(){
+  if (typeof dlg.close === 'function') dlg.close(); else { dlg.removeAttribute('open'); dlg.dispatchEvent(new Event('close')); }
+}
+function drawQR(url, label){
+  const box = $('#qr');
+  const size = Math.round(Math.max(180, Math.min(360, innerWidth - 100, innerHeight - 340)));
+  box.style.setProperty('--qr-size', size + 'px');
+  box.innerHTML = '';
+  box.setAttribute('role', 'img');
+  box.setAttribute('aria-label', `QR 코드 — ${label}`);
+  const fail = () => { box.innerHTML = `<p class="qr__fail">QR을 만들지 못했어요.<br>아래 주소를 칠판에 적거나<br>링크를 복사해 보내 주세요.</p>`; };
+  if (typeof QRCode === 'undefined') return fail();
+  const css = getComputedStyle(document.documentElement);
+  const opt = { text:url, width:size * 2, height:size * 2, correctLevel:QRCode.CorrectLevel.M };   // 2배로 그려 줄인다 — 고해상도 화면에서도 모듈이 또렷하다
+  const dark = css.getPropertyValue('--qr-dark').trim(), light = css.getPropertyValue('--qr-light').trim();
+  if (dark) opt.colorDark = dark;
+  if (light) opt.colorLight = light;
+  try { new QRCode(box, opt); } catch (e){ fail(); }
+  box.removeAttribute('title');                              // 라이브러리가 넣는 긴 주소 툴팁은 뺀다
+}
+dlg.addEventListener('close', () => {
+  const t = qrTrigger;
+  qrTrigger = null;
+  if (t && t.isConnected) t.focus(); else $('#list').focus({ preventScroll:true });
+});
+dlg.addEventListener('pointerdown', e => { downOnBackdrop = e.target === dlg; });
+dlg.addEventListener('click', e => { if (downOnBackdrop && e.target === dlg) closeQR(); downOnBackdrop = false; });
+
+async function copyText(text){
+  try {
+    if (navigator.clipboard && window.isSecureContext){ await navigator.clipboard.writeText(text); return true; }
+  } catch (e){}
+  const host = document.querySelector('dialog[open]') || document.body;   // 모달 밖은 inert — 열린 창 안에 붙여야 선택된다
+  const ta = document.createElement('textarea');
+  ta.value = text;
+  ta.setAttribute('readonly', '');
+  ta.style.cssText = 'position:fixed;top:0;left:0;width:1px;height:1px;opacity:0;';
+  host.appendChild(ta);
+  ta.select();
+  let ok = false;
+  try { ok = document.execCommand('copy'); } catch (e){}
+  ta.remove();
+  return ok;
+}
+async function onCopy(btn){
+  const url = btn.dataset.copy, name = btn.dataset.name || '';
+  const prev = document.activeElement;
+  const ok = await copyText(url);
+  if (prev && prev.isConnected && document.activeElement !== prev) prev.focus({ preventScroll:true });
+  if (!ok){
+    announce('복사하지 못했어요. 주소를 길게 눌러 복사해 주세요.');
+    if (btn.classList.contains('tbtn')) openQR({ title:name, sub:'복사하지 못했어요 — 아래 주소를 직접 복사하거나 QR로 보내 주세요.', url, trigger:btn });
+    return;
+  }
+  announce(`${name ? name + ' ' : ''}링크를 복사했어요`);
+  const use = btn.querySelector('use'), label = btn.querySelector('span');
+  if (!btn.dataset.icon) btn.dataset.icon = use.getAttribute('href');
+  if (label && !btn.dataset.label) btn.dataset.label = label.textContent;
+  btn.classList.add('is-done');                              // 결과는 누른 자리에서 보여 준다 — 토스트를 쓰지 않는다 (§6.5-4)
+  use.setAttribute('href', '#i-done');
+  if (label) label.textContent = '복사했어요';
+  if (btn.classList.contains('tbtn')) btn.dataset.tip = '복사됨';
+  clearTimeout(btn._t);
+  btn._t = setTimeout(() => resetCopyBtn(btn), 2200);
+}
+function resetCopyBtn(btn){
+  clearTimeout(btn._t);
+  btn.classList.remove('is-done');
+  delete btn.dataset.tip;
+  if (btn.dataset.icon) btn.querySelector('use').setAttribute('href', btn.dataset.icon);
+  const label = btn.querySelector('span');
+  if (label && btn.dataset.label) label.textContent = btn.dataset.label;
+}
+
+/* ============================================================
+   10) 이벤트
+   ============================================================ */
+document.addEventListener('click', e => {
+  const t = e.target instanceof Element ? e.target : null;
+  if (!t) return;
+
+  const nav = t.closest('a[data-grade]');                    // 목차 레일 · 가로 칩
+  if (nav){
+    if (e.button !== 0 || e.metaKey || e.ctrlKey || e.shiftKey || e.altKey) return;   // 새 탭으로 열기는 그대로 둔다
+    e.preventDefault();
+    const g = nav.dataset.grade, u = nav.dataset.unit;
+    setFilter({ grade:g, unit:u });
+    if (!nav.isConnected){                                   // 칩은 새로 그려진다 — 같은 칩으로 포커스를 되돌린다
+      const again = $(`#chipbar a[data-grade="${CSS.escape(g)}"][data-unit="${CSS.escape(u)}"]`);
+      if (again) again.focus({ preventScroll:true });
+    }
+    return;
+  }
+  const view = t.closest('[data-view]');
+  if (view) return setFilter({ view:view.dataset.view }, { scroll:false });
+
+  const act = t.closest('[data-act]');
+  if (act){
+    switch (act.dataset.act){
+      case 'retry':      return loadAll();
+      case 'search-all': return setFilter({ grade:'', unit:'' });
+      case 'clear-q':    return clearQuery();
+      case 'reset':      $('#q').value = ''; return setFilter({ grade:'', unit:'', q:'' });
+    }
+    return;
+  }
+  if (t.closest('#q-clear')) return clearQuery();
+  if (t.closest('#btn-theme')) return toggleTheme();
+
+  const pane = t.closest('.switch [data-pane]');
+  if (pane) return setPane(pane.dataset.pane, true);
+  const copy = t.closest('[data-copy]');
+  if (copy) return onCopy(copy);
+  const qr = t.closest('[data-qr]');
+  if (qr) return openQR({ title:qr.dataset.name, sub:'학생 기기 카메라로 찍으면 바로 열려요.', url:qr.dataset.qr, trigger:qr });
+  const send = t.closest('#btn-send');
+  if (send) return openSend(send);
+  const unitSend = t.closest('[data-send-unit]');             // 단원 머리의 '보내기' — 화면의 필터는 그대로 두고 그 단원만 보낸다
+  if (unitSend) return openSend(unitSend, { grade:unitSend.dataset.sendGrade, unit:unitSend.dataset.sendUnit, q:'', view:state.f.view });
+  if (t.closest('#btn-refresh')) return loadAll();
+  if (t.closest('#dlg-close')) return closeQR();
+
+});
+
+let qTimer, liveTimer;
+$('#q').addEventListener('input', e => {
+  const before = state.f.q.trim();
+  state.f.q = e.target.value;
+
+  renderNav(false);                                          // 목차 링크 주소에도 검색어를 싣는다
+  renderList();
+  updateSendBtn();
+
+  clearTimeout(qTimer);
+  qTimer = setTimeout(() => syncURL(false), 300);
+  clearTimeout(liveTimer);
+  liveTimer = setTimeout(() => announce(`${visibleItems().length}개 실험`), 700);
+});
+
+document.addEventListener('keydown', e => {
+  if (e.ctrlKey || e.metaKey || e.altKey || e.isComposing) return;
+  const el = e.target instanceof Element ? e.target : null;
+  if (el && el.closest('input, textarea, select, [contenteditable="true"]')){
+    if (e.key === 'Escape' && el.id === 'q' && el.value){ e.preventDefault(); clearQuery(); }
+    return;
+  }
+  if (document.querySelector('dialog[open]')){
+    if (e.key === 'Escape'){ e.preventDefault(); closeQR(); }   // 기본 동작에만 기대지 않는다(showModal 대체 경로 포함)
+    return;
+  }
+  /* 자판 위치(code)와 글자(key)를 둘 다 본다 — 한글 자판에서는 D 자리가 'ㅇ'이다 */
+  if (e.code === 'KeyD' || e.key === 'd' || e.key === 'D' || e.key === 'ㅇ'){ e.preventDefault(); toggleTheme(); }
+  else if (e.code === 'Slash' || e.key === '/'){ e.preventDefault(); focusSearch(); }
+});
+
+addEventListener('popstate', () => {
+  readURL();
+  setPane(state.pane, false);
+  renderNav(false);
+  renderList();
+  updateSendBtn();
+
+});
+
+/* 상단 바 — 내리면 경계선, 제목이 가려지면 바에 작은 제목 */
+const bar = $('#bar');
+const onScroll = () => bar.classList.toggle('is-scrolled', scrollY > 4);
+addEventListener('scroll', onScroll, { passive:true });
+onScroll();
+if ('IntersectionObserver' in window){
+  new IntersectionObserver(([en]) => bar.classList.toggle('is-titled', !en.isIntersecting),
+    { rootMargin:`-${bar.offsetHeight}px 0px 0px 0px` }).observe($('#h1'));
+}
+
+/* ============================================================
+   11) 불러오기 — 캐시로 먼저 그리고, 시트를 새로 읽어 바뀐 것만 다시 그린다
+   ============================================================ */
+let loading = false;
+const sig = () => JSON.stringify(KEYS.map(k => [state.status[k], state.data[k].map(i => [i.grade, i.unit, i.title, i.url, i.dateRaw])]));
+async function loadAll(){
+  if (loading) return;
+  loading = true;
+
+  const rb = $('#btn-refresh');
+  rb.classList.add('is-busy');
+  rb.setAttribute('aria-busy', 'true');
+  setSync('busy');
+
+  const cache = readCache();
+  let fromCache = false;
+  KEYS.forEach(k => {
+    const c = cache?.data?.[k];
+    if (!state.data[k].length && c?.length){ state.data[k] = revive(c); state.status[k] = 'ok'; fromCache = true; }
+  });
+  if (fromCache) renderAll();
+  const before = sig();
+
+  await Promise.all(CONFIG.SECTIONS.map(async s => {
+    try {
+      const items = await loadSection(s);
+      state.data[s.key] = items;
+      state.status[s.key] = items.length ? 'ok' : 'empty';
+      state.staleAt[s.key] = null;
+      if (items.length) writeCache(s.key, items);
+    } catch (e){
+      console.warn('[송쌤과학] 시트를 읽지 못했습니다:', s.key, e);
+      const c = cache?.data?.[s.key];
+      if (c?.length){                                        // 1순위: 최근에 성공한 목록
+        state.data[s.key] = revive(c);
+        state.status[s.key] = 'stale';
+        state.staleAt[s.key] = cache.t?.[s.key] ? new Date(cache.t[s.key]) : null;
+      } else if (SNAPSHOT[s.key]){                           // 2순위: 내장 스냅샷
+        state.data[s.key] = toItems([SNAPSHOT[s.key].headers, ...SNAPSHOT[s.key].rows]);
+        state.status[s.key] = 'stale';
+        state.staleAt[s.key] = null;
+      } else {
+        state.data[s.key] = [];
+        state.status[s.key] = 'error';
+      }
+    }
+  }));
+
+  state.lastSync = new Date();
+  if (sig() !== before) renderAll();
+
+  setSync(KEYS.some(k => state.status[k] === 'stale' || state.status[k] === 'error') ? 'stale' : 'ok');
+  rb.classList.remove('is-busy');
+  rb.removeAttribute('aria-busy');
+
+  loading = false;
+}
+/* 탭을 10분 넘게 떠났다 돌아오면 조용히 한 번 더 읽는다 (시트에 방금 추가한 행도 반영) */
+const refreshIfOld = () => { if (state.lastSync && Date.now() - state.lastSync.getTime() > 10 * 60 * 1000) loadAll(); };
+document.addEventListener('visibilitychange', () => { if (document.visibilityState === 'visible') refreshIfOld(); });
+addEventListener('pageshow', e => { if (e.persisted) refreshIfOld(); });
+
+/* 시작 */
+readURL();
+
+setPane(state.pane, false);
+$('#to-student').href = studentBase();
+
+renderAll();
+loadAll();
+</script>
+</body>
+</html>
