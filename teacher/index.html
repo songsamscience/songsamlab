@@ -779,7 +779,7 @@ const CONFIG = {
   SHEET_ID: '1QVuEU-SQoX_kEvTFFNW0c2B90sMOy5M5n-QU0SjRMiU',
   SECTIONS: [
     { key:'lab',  tabs:['과학'],     gid:'0',          expectHead:/실험|단원|학년/ },
-    { key:'work', tabs:['학교수업'], gid:'1677663949', expectHead:/도구|업무/ },
+    { key:'work', tabs:['학교업무'], gid:'1677663949', expectHead:/도구|업무/ },
   ],
   HIDE_URL: /songsamscience\.github\.io\/songsamlab(\/|$)/i,   // 이 실험실 자신을 가리키는 행은 목록에서 뺀다
   NEW_MONTHS: 1,                                               // 최근 한 달 안에 편집(업데이트)한 항목에 NEW
@@ -842,7 +842,7 @@ const SNAPSHOT = {
       ['중2','4.물질의 구성','주기율표 3분 퀴즈_V2','https://songsamscience.github.io/periodic-table-quiz-game/','2026.8.22.'],
       ['중2','4.물질의 구성','원자의 구조-보어의 원자 모형','https://songsamscience.github.io/atom-structure/','2026.2.23.'],
       ['중2','4.물질의 구성','전기분해 실험','https://songsamscience.github.io/electrolysis-experiment/','2026.8.18.'],
-      ['중2','4.물질의 구성','원소기호화 화학식_V2','https://songsamscience.github.io/Element-Symbols-and-Chemical-Formulas/','2026.8.22.'],
+      ['중2','4.물질의 구성','원소기호와 화학식_V2','https://songsamscience.github.io/Element-Symbols-and-Chemical-Formulas/','2026.8.22.'],
       ['중2','4.물질의 구성','원자와 이온 모형 탐구','https://songsamscience.github.io/atom-and-ion/','2026.8.30.'],
       ['중2','4.물질의 구성','전기에 의한 양이온과 음이온의 이동','https://songsamscience.github.io/movement-of-cations-and-anions/','2026.9.1.'],
       ['중2','4.물질의 구성','분자 만들기(제작중)','https://songsamscience.github.io/Building-molecules/','2026.9.1.'],
@@ -1374,7 +1374,7 @@ function renderTools(){
   if (!items.length){
     ul.innerHTML = state.status.work === 'loading'
       ? '<li class="sk"></li>'.repeat(5)
-      : `<li class="tools__note">아직 올라온 도구가 없어요. 시트 ‘학교수업’ 탭에 적으면 여기에 올라와요.</li>`;
+      : `<li class="tools__note">아직 올라온 도구가 없어요. 시트 ‘학교업무’ 탭에 적으면 여기에 올라와요.</li>`;
     return;
   }
   ul.innerHTML = items.map(it => {
